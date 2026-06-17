@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMW Quality Portal - Work In Process</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Chart.js & Datalabels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div id="main-wrapper">
+        <div id="header-container"></div>
+        <main>
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label for="wip-type">Type Filter</label>
+                    <select id="wip-type">
+                        <option value="LHD">LHD Mirror Caps</option>
+                        <option value="RHD">RHD Mirror Caps</option>
+                        <option value="Diffuser">Diffuser</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Custom Styled Chart Header Banner -->
+            <div style="display: flex; justify-content: center; margin-bottom: 0.5rem;">
+                <div class="chart-header-banner" id="wip-chart-header" style="border-color: var(--accent-blue); background-color: var(--accent-blue-light); color: var(--accent-blue);">
+                    TOTAL WIP - LHD Mirror Caps
+                </div>
+            </div>
+
+            <!-- WIP Line Chart Card -->
+            <div class="card">
+                <div class="chart-wrapper" style="height: 420px;">
+                    <canvas id="wipChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Table & Targets Layout -->
+            <div class="grid-2col">
+                <!-- Data Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">WIP Monthly Records</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Total WIP</th>
+                                    <th>Pending Rework</th>
+                                    <th>Active WIP</th>
+                                    <th>Est. WIP (Target)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wip-table-body">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- WIP targets config -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">WIP Master Data (Est. WIP Limits)</h3>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        Define target Est. WIP levels for each production type. These represent upper control limit thresholds.
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                        <div class="filter-group">
+                            <label for="target-wip-lhd">Est. WIP LHD</label>
+                            <input type="number" id="target-wip-lhd" class="wip-target-input" value="2360">
+                        </div>
+                        <div class="filter-group">
+                            <label for="target-wip-rhd">Est. WIP RHD</label>
+                            <input type="number" id="target-wip-rhd" class="wip-target-input" value="960">
+                        </div>
+                        <div class="filter-group">
+                            <label for="target-wip-diffuser">Est. WIP Diffuser</label>
+                            <input type="number" id="target-wip-diffuser" class="wip-target-input" value="700">
+                        </div>
+                        <button class="btn btn-primary" id="save-wip-targets-btn" style="margin-top: 1rem;">
+                            <i data-lucide="save"></i> Save WIP Master Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/mock-data.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/wip.js"></script>
+</body>
+</html>

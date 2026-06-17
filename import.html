@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMW Quality Portal - Central Data Import</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- SheetJS (XLSX) parser -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div id="main-wrapper">
+        <div id="header-container"></div>
+        <main>
+            <!-- Central explanation card -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Central Data Import Portal</h3>
+                        <p class="card-subtitle">Upload Excel files (.xlsx/.xls) or paste raw spreadsheet data to update system databases.</p>
+                    </div>
+                </div>
+                <div style="background-color: var(--accent-blue-light); color: var(--accent-blue); padding: 1rem 1.25rem; border-radius: 8px; font-size: 0.875rem; font-weight: 500; display: flex; align-items: flex-start; gap: 0.5rem;">
+                    <i data-lucide="info" style="flex-shrink: 0; margin-top: 2px;"></i>
+                    <div>
+                        <strong>File Import Instructions:</strong> Excel sheet tab names must match standard definitions (e.g. <code>FPY</code> and <code>FY</code> for Yield, <code>Daily Scrap</code> and <code>Inven</code> for Scrap Defects).
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="tab-container">
+                <ul class="tabs-list">
+                    <li class="tab-item active" id="btn-tab-yield" onclick="switchImportTab('yield')">Yield (FPY/FY)</li>
+                    <li class="tab-item" id="btn-tab-ppm" onclick="switchImportTab('ppm')">PPM</li>
+                    <li class="tab-item" id="btn-tab-claims" onclick="switchImportTab('claims')">Claims</li>
+                    <li class="tab-item" id="btn-tab-wip" onclick="switchImportTab('wip')">WIP</li>
+                    <li class="tab-item" id="btn-tab-rework" onclick="switchImportTab('rework')">Rework</li>
+                    <li class="tab-item" id="btn-tab-scrap-top" onclick="switchImportTab('scrap-top')">Scrap Defect & Inven</li>
+                    <li class="tab-item" id="btn-tab-scrap-input" onclick="switchImportTab('scrap-input')">Scrap Data Input</li>
+                </ul>
+            </div>
+
+            <!-- Tab 1: Yield Import -->
+            <div id="content-tab-yield" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option A: Excel File Upload</h3>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                            Select an Excel file. The script will look for two tabs: <code>FPY</code> and <code>FY</code>.
+                        </p>
+                        <input type="file" id="file-yield-input" accept=".xlsx, .xls">
+                        <button class="btn btn-primary" id="upload-yield-btn" style="align-self: flex-start;">
+                            <i data-lucide="upload"></i> Upload & Import Yield File
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option B: Copy-Paste Data</h3>
+                    </div>
+                    <div class="grid-2col">
+                        <div class="paste-container">
+                            <label for="paste-yield-fpy">Paste FPY Data (First Part Yield)</label>
+                            <textarea id="paste-yield-fpy" class="paste-textarea" placeholder="Paste FPY sheet cells here...&#10;Expected format: Double-header layout. Columns: Date, Project, followed by [Process name] columns (Ins, OK, Yield) e.g., Layup, Trimming, Gluing, Sanding, Dry Sanding, Painting, Polishing."></textarea>
+                        </div>
+                        <div class="paste-container">
+                            <label for="paste-yield-fy">Paste FY Data (Final Yield)</label>
+                            <textarea id="paste-yield-fy" class="paste-textarea" placeholder="Paste FY sheet cells here...&#10;Expected format: Double-header layout. Columns: Date, Project, followed by [Process name] columns (Ins, OK, Yield) e.g., Layup, Trimming, Gluing, Sanding, Dry Sanding, Painting, Polishing."></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="paste-yield-btn" style="width: 100%;">
+                        <i data-lucide="check"></i> Process & Save Pasted Yield Data
+                    </button>
+                </div>
+
+                <div class="card" style="border-color: var(--color-danger); opacity: 0.95; margin-top: 1.5rem;">
+                    <div class="card-header" style="margin-bottom: 1rem;">
+                        <h3 class="card-title" style="color: var(--color-danger); display: flex; align-items: center; gap: 0.5rem;">
+                            <i data-lucide="alert-triangle"></i> Danger Zone
+                        </h3>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;">
+                            Permanently clear all existing FPY and FY Yield records from local storage.
+                        </p>
+                        <button class="btn btn-danger" id="clear-yield-btn">
+                            <i data-lucide="trash-2"></i> Clear Yield Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: PPM Import -->
+            <div id="content-tab-ppm" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option A: PPM Excel File Upload</h3>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                            Select a PPM Excel file. The script will parse the sheets for SMR/SMP cross-tabulated customer PPM data or standard flat records.
+                        </p>
+                        <input type="file" id="file-ppm-input" accept=".xlsx, .xls">
+                        <button class="btn btn-primary" id="upload-ppm-btn" style="align-self: flex-start;">
+                            <i data-lucide="upload"></i> Upload & Import PPM File
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option B: Copy-Paste Data</h3>
+                    </div>
+                    <div class="paste-container">
+                        <label for="paste-ppm">Copy-Paste PPM Excel cells (Pivoted table or flat columns)</label>
+                        <textarea id="paste-ppm" class="paste-textarea" style="height: 180px;" placeholder="Pivoted table format (with Customer, Delivery Quantity rows)&#10;OR flat columns: Date, Customer, DefectQty, ShippedQty"></textarea>
+                    </div>
+                    <button class="btn btn-primary" id="paste-ppm-btn" style="width: 100%; margin-top: 1rem;">
+                        <i data-lucide="check"></i> Process PPM Paste
+                    </button>
+                </div>
+
+                <div class="card" style="border-color: var(--color-danger); opacity: 0.95; margin-top: 1.5rem;">
+                    <div class="card-header" style="margin-bottom: 1rem;">
+                        <h3 class="card-title" style="color: var(--color-danger); display: flex; align-items: center; gap: 0.5rem;">
+                            <i data-lucide="alert-triangle"></i> Danger Zone
+                        </h3>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;">
+                            Permanently clear all existing PPM records from local storage.
+                        </p>
+                        <button class="btn btn-danger" id="clear-ppm-btn">
+                            <i data-lucide="trash-2"></i> Clear PPM Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Claims Import -->
+            <div id="content-tab-claims" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option A: Claims Excel File Upload</h3>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                            Select a Claims Excel file. The script will parse the sheet for raw claim transactions.
+                        </p>
+                        <input type="file" id="file-claims-input" accept=".xlsx, .xls">
+                        <button class="btn btn-primary" id="upload-claims-btn" style="align-self: flex-start;">
+                            <i data-lucide="upload"></i> Upload & Import Claims File
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option B: Copy-Paste Data</h3>
+                    </div>
+                    <div class="paste-container">
+                        <label for="paste-claims">Copy-Paste Claims Excel cells</label>
+                        <textarea id="paste-claims" class="paste-textarea" style="height: 180px;" placeholder="Columns: วันที่ยิงรับงาน, Project, Location, Claimed Type"></textarea>
+                    </div>
+                    <button class="btn btn-primary" id="paste-claims-btn" style="width: 100%; margin-top: 1rem;">
+                        <i data-lucide="check"></i> Process Claims Data
+                    </button>
+                </div>
+
+                <div class="card" style="border-color: var(--color-danger); opacity: 0.95; margin-top: 1.5rem;">
+                    <div class="card-header" style="margin-bottom: 1rem;">
+                        <h3 class="card-title" style="color: var(--color-danger); display: flex; align-items: center; gap: 0.5rem;">
+                            <i data-lucide="alert-triangle"></i> Danger Zone
+                        </h3>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;">
+                            Permanently clear all existing Claims records from local storage.
+                        </p>
+                        <button class="btn btn-danger" id="clear-claims-btn">
+                            <i data-lucide="trash-2"></i> Clear Claims Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 4: WIP Import -->
+            <div id="content-tab-wip" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option A: WIP Excel File Upload</h3>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                            Select a WIP Excel file containing daily WIP matrix data. The script will automatically scan all date columns.
+                        </p>
+                        <input type="file" id="file-wip-input" accept=".xlsx, .xls">
+                        <button class="btn btn-primary" id="upload-wip-btn" style="align-self: flex-start;">
+                            <i data-lucide="upload"></i> Upload & Import WIP File
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option B: Copy-Paste Data</h3>
+                    </div>
+                    <div class="paste-container">
+                        <label for="paste-wip">Copy-Paste WIP Excel cells (Matrix format)</label>
+                        <textarea id="paste-wip" class="paste-textarea" style="height: 180px;" placeholder="Expected format: Category (Total WIP / Pending Rework / ACTIVE WIP), Sub-type, Type, followed by date columns (e.g. 01-Jan-26, 02-Jan-26...)"></textarea>
+                    </div>
+                    <button class="btn btn-primary" id="paste-wip-btn" style="width: 100%; margin-top: 1rem;">
+                        <i data-lucide="check"></i> Process WIP Data
+                    </button>
+                </div>
+
+                <div class="card" style="border-color: var(--color-danger); opacity: 0.95; margin-top: 1.5rem;">
+                    <div class="card-header" style="margin-bottom: 1rem;">
+                        <h3 class="card-title" style="color: var(--color-danger); display: flex; align-items: center; gap: 0.5rem;">
+                            <i data-lucide="alert-triangle"></i> Danger Zone
+                        </h3>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;">
+                            Permanently clear all existing WIP records from local storage.
+                        </p>
+                        <button class="btn btn-danger" id="clear-wip-btn">
+                            <i data-lucide="trash-2"></i> Clear WIP Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 5: Rework Import -->
+            <div id="content-tab-rework" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option A: Excel File Upload</h3>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                            Select a Rework Excel file containing daily process Rework matrix data. The script will automatically scan all date columns.
+                        </p>
+                        <input type="file" id="file-rework-input" accept=".xlsx, .xls">
+                        <button class="btn btn-primary" id="upload-rework-btn" style="align-self: flex-start;">
+                            <i data-lucide="upload"></i> Upload & Import Rework File
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option B: Copy-Paste Data</h3>
+                    </div>
+                    <div class="paste-container">
+                        <label for="paste-rework">Copy-Paste Rework Excel cells (Matrix format)</label>
+                        <textarea id="paste-rework" class="paste-textarea" style="height: 180px;" placeholder="Expected format: ERP Code, Process (e.g. Layup:OK / Layup:Rework), followed by date columns (e.g. 10-Mar, 11-Mar...)"></textarea>
+                    </div>
+                    <button class="btn btn-primary" id="paste-rework-btn" style="width: 100%; margin-top: 1rem;">
+                        <i data-lucide="check"></i> Process Rework Data
+                    </button>
+                </div>
+
+                <div class="card" style="border-color: var(--color-danger); opacity: 0.95; margin-top: 1.5rem;">
+                    <div class="card-header" style="margin-bottom: 1rem;">
+                        <h3 class="card-title" style="color: var(--color-danger); display: flex; align-items: center; gap: 0.5rem;">
+                            <i data-lucide="alert-triangle"></i> Danger Zone
+                        </h3>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;">
+                            Permanently clear all existing Rework records from local storage.
+                        </p>
+                        <button class="btn btn-danger" id="clear-rework-btn">
+                            <i data-lucide="trash-2"></i> Clear Rework Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 4: Scrap Defect & Inventory -->
+            <div id="content-tab-scrap-top" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option A: Excel File Upload</h3>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                            Select an Excel file containing defect logs. The script will parse sheets: <code>Daily Scrap</code> and <code>Inven</code>.
+                        </p>
+                        <input type="file" id="file-scrap-input" accept=".xlsx, .xls">
+                        <button class="btn btn-primary" id="upload-scrap-btn" style="align-self: flex-start;">
+                            <i data-lucide="upload"></i> Upload & Import Scrap Defect File
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option B: Copy-Paste Data</h3>
+                    </div>
+                    <div class="grid-2col">
+                        <div class="paste-container">
+                            <label for="paste-scrap-daily">Paste Daily Scrap cells (Flat OR Matrix format)</label>
+                            <textarea id="paste-scrap-daily" class="paste-textarea" placeholder="Flat format: Columns: Date, Process, ERPCode, Defect, Qty&#10;OR Matrix format: ERP Code, Process (e.g. Layup:OK/Scrap), followed by date columns (e.g. 10-Mar, 11-Mar...)"></textarea>
+                        </div>
+                        <div class="paste-container">
+                            <label for="paste-scrap-inven">Paste Inventory Input sheet cells</label>
+                            <textarea id="paste-scrap-inven" class="paste-textarea" placeholder="Columns: Date/Month, ERPCode, InputQty"></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="paste-scrap-btn" style="width: 100%;">
+                        <i data-lucide="check"></i> Process Pasted Defect Data
+                    </button>
+                </div>
+
+                <div class="card" style="border-color: var(--color-danger); opacity: 0.95; margin-top: 1.5rem;">
+                    <div class="card-header" style="margin-bottom: 1rem;">
+                        <h3 class="card-title" style="color: var(--color-danger); display: flex; align-items: center; gap: 0.5rem;">
+                            <i data-lucide="alert-triangle"></i> Danger Zone
+                        </h3>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;">
+                            Permanently clear all existing Scrap, Daily Scrap, and Scrap Inventory records from local storage.
+                        </p>
+                        <button class="btn btn-danger" id="clear-scrap-btn">
+                            <i data-lucide="trash-2"></i> Clear Scrap Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 7: Scrap Data Input -->
+            <div id="content-tab-scrap-input" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option A: Excel File Upload</h3>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                            Select a Scrap Input Excel file. The script will parse the sheet for daily status records (Columns: <code>Date</code>, <code>ProcessStatus</code>, <code>ERPCode</code>, <code>Qty</code>).
+                        </p>
+                        <input type="file" id="file-scrap-input-new" accept=".xlsx, .xls">
+                        <button class="btn btn-primary" id="upload-scrap-input-btn" style="align-self: flex-start;">
+                            <i data-lucide="upload"></i> Upload & Import Scrap Data
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option B: Copy-Paste Data</h3>
+                    </div>
+                    <div class="paste-container">
+                        <label for="paste-scrap-input-new">Copy-Paste Scrap Excel cells</label>
+                        <textarea id="paste-scrap-input-new" class="paste-textarea" style="height: 180px;" placeholder="Columns: Date, ProcessStatus, ERPCode, Qty"></textarea>
+                    </div>
+                    <button class="btn btn-primary" id="paste-scrap-input-btn" style="width: 100%; margin-top: 1rem;">
+                        <i data-lucide="check"></i> Process Scrap Data
+                    </button>
+                </div>
+
+                <!-- Log Grid Card (Imported from scrap-input.html) -->
+                <div class="card" style="margin-top: 1.5rem;">
+                    <div class="card-header" style="flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+                        <h3 class="card-title">Recorded Scrap Data Logs</h3>
+                        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-left: auto;">
+                            <input type="date" id="search-start-date" placeholder="Start Date" style="min-width: 130px; padding: 0.35rem 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main);">
+                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">to</span>
+                            <input type="date" id="search-end-date" placeholder="End Date" style="min-width: 130px; padding: 0.35rem 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main);">
+                            <select id="search-process-status" style="min-width: 150px; padding: 0.35rem 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main);">
+                                <option value="All">All Processes</option>
+                                <option value="Layup">Layup</option>
+                                <option value="Trimming">Trimming</option>
+                                <option value="Gluing">Gluing</option>
+                                <option value="Sanding">Sanding</option>
+                                <option value="Drysanding">Dry Sanding</option>
+                                <option value="Painting">Painting</option>
+                                <option value="Polishing">Polishing</option>
+                            </select>
+                            <button class="btn btn-secondary" id="search-btn"><i data-lucide="search"></i> Search</button>
+                            <button class="btn btn-secondary" id="reset-search-btn">Reset</button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-danger" id="delete-selected-btn" disabled style="padding: 0.5rem 1rem;">
+                                <i data-lucide="trash"></i> Delete Selected
+                            </button>
+                            <button class="btn btn-secondary" id="delete-all-btn" style="padding: 0.5rem 1rem; border-color: rgba(239, 68, 68, 0.2); color: var(--color-danger);">
+                                <i data-lucide="alert-triangle"></i> Clear All Data
+                            </button>
+                        </div>
+                        <div class="pagination-info" id="pagination-summary" style="font-size: 0.875rem; color: var(--text-secondary); font-weight: 500;">Showing 0-0 of 0 entries</div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px; text-align: center;">
+                                        <input type="checkbox" id="select-all-checkbox">
+                                    </th>
+                                    <th>No.</th>
+                                    <th>Date</th>
+                                    <th>Process Status</th>
+                                    <th>ERP Code</th>
+                                    <th>Quantity (pcs)</th>
+                                    <th style="width: 80px; text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scrap-logs-table-body">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination controls -->
+                    <div class="pagination-container" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem;">
+                        <div id="entries-per-page-container" style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">
+                            Page size: 25 items
+                        </div>
+                        <div class="pagination-controls" id="pagination-controls-div" style="display: flex; gap: 0.25rem;">
+                            <!-- Dynamic buttons -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div class="modal-overlay" id="confirm-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Confirm Action</h3>
+            </div>
+            <div class="modal-body" id="modal-msg">
+                Are you sure you want to perform this operation? This action is irreversible.
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+                <button class="btn btn-danger" id="modal-confirm-btn">Yes, Clear</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/mock-data.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/import.js"></script>
+    <script src="js/scrap-input.js"></script>
+</body>
+</html>

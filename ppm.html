@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMW Quality Portal - PPM Report</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Chart.js & Datalabels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div id="main-wrapper">
+        <div id="header-container"></div>
+        <main>
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label for="ppm-report-type">Report Type</label>
+                    <select id="ppm-report-type">
+                        <option value="Monthly">Monthly</option>
+                        <option value="Quarterly">Quarterly</option>
+                    </select>
+                </div>
+                <div class="filter-group" id="ppm-year-group">
+                    <label for="ppm-year">Year</label>
+                    <select id="ppm-year">
+                        <option value="2026">2026</option>
+                        <option value="2025">2025</option>
+                    </select>
+                </div>
+                <div class="filter-group" id="ppm-quarter-group" style="display: none;">
+                    <label for="ppm-quarter">Quarter</label>
+                    <select id="ppm-quarter">
+                        <option value="Q1">Q1</option>
+                        <option value="Q2">Q2</option>
+                        <option value="Q3">Q3</option>
+                        <option value="Q4">Q4</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- PPM Chart Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Monthly PPM by Customer</h3>
+                        <p class="card-subtitle">Comparing Parts Per Million defect rates by customer</p>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="ppmChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Data Table Card & Target Master Data Grid -->
+            <div class="grid-2col">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">PPM Details Table</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Month/Quarter</th>
+                                    <th>Customer</th>
+                                    <th>Shipped Qty</th>
+                                    <th>Defect Qty</th>
+                                    <th>PPM</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ppm-table-body">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">PPM Target Master Data</h3>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                        Set PPM target thresholds for each part family. Updates reflect instantly on dashboard benchmarks.
+                    </p>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Target PPM</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ppm-targets-body">
+                                <!-- Dynamic Target rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class="btn btn-primary" id="save-targets-btn" style="margin-top: 1rem; width: 100%;">
+                        <i data-lucide="save"></i> Save PPM Targets
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/mock-data.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/ppm.js"></script>
+</body>
+</html>

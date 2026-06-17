@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMW Quality Portal - Claim Part Returned</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Chart.js & Datalabels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div id="main-wrapper">
+        <div id="header-container"></div>
+        <main>
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label for="claims-project">Select Project</label>
+                    <select id="claims-project">
+                        <option value="All">All Projects</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="claims-quarter">Select Quarter</label>
+                    <select id="claims-quarter">
+                        <option value="All">All Quarters</option>
+                        <option value="Q1">Q1 (Jan - Mar)</option>
+                        <option value="Q2">Q2 (Apr - Jun)</option>
+                        <option value="Q3">Q3 (Jul - Sep)</option>
+                        <option value="Q4">Q4 (Oct - Dec)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Double Chart Layout -->
+            <div class="grid-2col">
+                <!-- Chart 1: Claim Part Returned by Type -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Claims by Type</h3>
+                            <p class="card-subtitle" id="title-type-quarter">Total for selected quarter</p>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper" style="height: 650px;">
+                        <canvas id="claimTypeChart"></canvas>
+                    </div>
+                    <div style="margin-top: 1rem; display: flex; justify-content: space-around; font-size: 0.85rem; font-weight: 600;">
+                        <div style="color: var(--accent-bronze);">Total 2025: <span id="total-2025-type">0</span> pcs</div>
+                        <div style="color: var(--accent-blue);">Total 2026: <span id="total-2026-type">0</span> pcs</div>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Part Return Status by Location -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Part Return Status</h3>
+                            <p class="card-subtitle" id="title-location-quarter">Location distribution with % labels</p>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper" style="height: 650px;">
+                        <canvas id="claimLocationChart"></canvas>
+                    </div>
+                    <div style="margin-top: 1rem; display: flex; justify-content: space-around; font-size: 0.85rem; font-weight: 600;">
+                        <div style="color: var(--accent-bronze);">Total 2025: <span id="total-2025-loc">0</span> pcs</div>
+                        <div style="color: var(--accent-blue);">Total 2026: <span id="total-2026-loc">0</span> pcs</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Claim Records Details</h3>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Quarter</th>
+                                <th>Project</th>
+                                <th>Claimed Type</th>
+                                <th>Location</th>
+                                <th>Quantity (2025)</th>
+                                <th>Quantity (2026)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="claims-table-body">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/mock-data.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/claims.js"></script>
+</body>
+</html>

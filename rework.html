@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMW Quality Portal - Rework Rate</title>
+    <link class="theme-style" rel="stylesheet" href="styles.css">
+    <!-- Chart.js & Datalabels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div id="main-wrapper">
+        <div id="header-container"></div>
+        <main>
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label for="rework-quarter">Select Quarter for Comparison Chart</label>
+                    <select id="rework-quarter">
+                        <option value="Q1">Q1 (Jan - Mar)</option>
+                        <option value="Q2">Q2 (Apr - Jun)</option>
+                        <option value="Q3">Q3 (Jul - Sep)</option>
+                        <option value="Q4">Q4 (Oct - Dec)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Double Chart Layout -->
+            <div class="grid-2col">
+                <!-- Chart 1: Overall Monthly Trend (Current Year 2026) -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Avg. Rework Rate & Avg. Waiting for Rework</h3>
+                            <p class="card-subtitle">Overall Monthly Trend for 2026</p>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper" style="height: 440px;">
+                        <canvas id="reworkTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Comparative Quarter Chart (Selected Quarter 2025 vs 2026) -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Comparative Rework Performance</h3>
+                            <p class="card-subtitle" id="rework-comp-subtitle">Quarter comparison 2025 vs 2026</p>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper" style="height: 440px;">
+                        <canvas id="reworkCompChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Rework Rates Monthly Log</h3>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date/Month</th>
+                                <th>Quarter</th>
+                                <th>Year</th>
+                                <th>Avg. Waiting for Rework (pcs)</th>
+                                <th>Avg. Rework Insert (pcs)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rework-table-body">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/mock-data.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/rework.js"></script>
+</body>
+</html>

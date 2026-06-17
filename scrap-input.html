@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMW Quality Portal - Scrap Input & Log</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div id="main-wrapper">
+        <div id="header-container"></div>
+        <main>
+            <!-- Excel Paste Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Paste Raw Scrap Data from Excel</h3>
+                        <p class="card-subtitle">Copy cells from Excel and paste directly below (Columns: Date, ProcessStatus, ERPCode, Qty)</p>
+                    </div>
+                </div>
+                <div class="paste-container">
+                    <textarea id="scrap-paste-input" class="paste-textarea" placeholder="Paste data here...&#10;Example format:&#10;14/06/2026&#9;Layup:OK&#9;G8X-013-103&#9;980&#10;14/06/2026&#9;Layup:Scrap&#9;G8X-013-103&#9;20"></textarea>
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn btn-primary" id="import-scrap-btn">
+                            <i data-lucide="check"></i> Process & Save Data
+                        </button>
+                        <button class="btn btn-secondary" id="clear-paste-btn">Clear Box</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Log Grid Card -->
+            <div class="card">
+                <div class="card-header" style="flex-wrap: wrap; gap: 1rem;">
+                    <h3 class="card-title">Recorded Scrap Data Logs</h3>
+                    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                        <input type="date" id="search-start-date" placeholder="Start Date" style="min-width: 130px;">
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">to</span>
+                        <input type="date" id="search-end-date" placeholder="End Date" style="min-width: 130px;">
+                        <select id="search-process-status" style="min-width: 150px;">
+                            <option value="All">All Processes</option>
+                            <option value="Layup">Layup</option>
+                            <option value="Trimming">Trimming</option>
+                            <option value="Gluing">Gluing</option>
+                            <option value="Sanding">Sanding</option>
+                            <option value="Drysanding">Dry Sanding</option>
+                            <option value="Painting">Painting</option>
+                            <option value="Polishing">Polishing</option>
+                        </select>
+                        <button class="btn btn-secondary" id="search-btn"><i data-lucide="search"></i> Search</button>
+                        <button class="btn btn-secondary" id="reset-search-btn">Reset</button>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div>
+                        <button class="btn btn-danger" id="delete-selected-btn" disabled>
+                            <i data-lucide="trash"></i> Delete Selected
+                        </button>
+                        <button class="btn btn-secondary" id="delete-all-btn">
+                            <i data-lucide="alert-triangle"></i> Clear All Data
+                        </button>
+                    </div>
+                    <div class="pagination-info" id="pagination-summary">Showing 0-0 of 0 entries</div>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 40px; text-align: center;">
+                                    <input type="checkbox" id="select-all-checkbox">
+                                </th>
+                                <th>No.</th>
+                                <th>Date</th>
+                                <th>Process Status</th>
+                                <th>ERP Code</th>
+                                <th>Quantity (pcs)</th>
+                                <th style="width: 80px; text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scrap-logs-table-body">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination controls -->
+                <div class="pagination-container">
+                    <div id="entries-per-page-container" style="font-size: 0.85rem; color: var(--text-secondary);">
+                        Page size: 25 items
+                    </div>
+                    <div class="pagination-controls" id="pagination-controls-div">
+                        <!-- Dynamic buttons -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Confirm Action</h3>
+            </div>
+            <div class="modal-body" id="modal-msg">
+                Are you sure you want to perform this operation? This action is irreversible.
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+                <button class="btn btn-danger" id="modal-confirm-btn">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/mock-data.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/scrap-input.js"></script>
+</body>
+</html>

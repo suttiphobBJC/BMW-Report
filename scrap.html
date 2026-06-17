@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMW Quality Portal - Scrap Analysis Reports</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Chart.js & Datalabels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div id="main-wrapper">
+        <div id="header-container"></div>
+        <main>
+            <!-- Tab Navigation for the two report types -->
+            <div class="tab-container">
+                <ul class="tabs-list">
+                    <li class="tab-item active" id="tab-btn-rate" onclick="switchTab('rate')">Monthly/Quarter Scrap Rate</li>
+                    <li class="tab-item" id="tab-btn-top" onclick="switchTab('top')">Top Process Scrap Defects</li>
+                </ul>
+            </div>
+
+            <!-- Tab 1: Scrap Process Rate -->
+            <div id="tab-content-rate" class="tab-content active">
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <label for="scrap-process">Process Status</label>
+                        <select id="scrap-process">
+                            <option value="Layup">Layup</option>
+                            <option value="Trimming">Trimming</option>
+                            <option value="Gluing">Gluing</option>
+                            <option value="Sanding">Sanding</option>
+                            <option value="Drysanding">Dry Sanding</option>
+                            <option value="Painting">Painting</option>
+                            <option value="Polishing">Polishing</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="scrap-grouping">Grouping Type</label>
+                        <select id="scrap-grouping">
+                            <option value="Monthly">Monthly</option>
+                            <option value="Quarterly">Quarterly</option>
+                        </select>
+                    </div>
+                    <div class="filter-group" id="scrap-quarter-filter-group" style="display: none;">
+                        <label for="scrap-quarter">Select Quarter</label>
+                        <select id="scrap-quarter">
+                            <option value="Q1">Q1</option>
+                            <option value="Q2">Q2</option>
+                            <option value="Q3">Q3</option>
+                            <option value="Q4">Q4</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <div class="scrap-target-container" style="margin-top: 1.25rem;">
+                            <label for="scrap-target-pct">Set Target % Scrap: </label>
+                            <input type="number" id="scrap-target-pct" value="2.0" step="0.1" min="0" max="100">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Header Banner (Dark borders, light bg, 20px font) -->
+                <div style="display: flex; justify-content: center; margin-bottom: 0.5rem;">
+                    <div class="chart-header-banner" id="scrap-chart-header">
+                        LAYUP
+                    </div>
+                </div>
+
+                <!-- Scrap Stacked Chart -->
+                <div class="card">
+                    <div class="chart-wrapper" style="height: 480px;">
+                        <canvas id="scrapRateChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Detail Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Scrap Rate Details</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Month/Week</th>
+                                    <th>OK Count (pcs)</th>
+                                    <th>Scrap Count (pcs)</th>
+                                    <th>% OK</th>
+                                    <th>% Scrap</th>
+                                    <th>Target % Scrap</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scrap-rate-table-body">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Top Process Scrap -->
+            <div id="tab-content-top" class="tab-content">
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <label for="top-year">Analysis Year</label>
+                        <select id="top-year">
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="top-erp-type">ERP Part Type</label>
+                        <select id="top-erp-type">
+                            <option value="MIRROR CAPS">MIRROR CAPS (G8X-013/015/017/019)</option>
+                            <option value="Diffuser">Diffuser (G8X-011)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Top Scrap Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Top 5 Scrap Defect Rates</h3>
+                            <p class="card-subtitle">Comparing Current Year vs Previous Year defect rates (%)</p>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper" style="height: 440px;">
+                        <canvas id="topScrapChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Scrap Details Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Defect Statistics Details</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Defect Reason</th>
+                                    <th>ERP Part Type</th>
+                                    <th>Previous Year Rate (%)</th>
+                                    <th>Current Year Rate (%)</th>
+                                    <th>Defect Qty (Selected Year)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="top-scrap-table-body">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/mock-data.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/scrap.js"></script>
+</body>
+</html>
