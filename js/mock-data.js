@@ -339,18 +339,65 @@ const MOCK_DATA = {
     ],
     scrap_inven: [
         // 2025 Inputs
-        { date: "2025-01-01", erp_code: "G8X-013-103", input_qty: 1200 },
-        { date: "2025-02-01", erp_code: "G8X-013-103", input_qty: 1300 },
-        { date: "2025-01-01", erp_code: "G8X-011-102", input_qty: 600 },
-        { date: "2025-02-01", erp_code: "G8X-011-102", input_qty: 650 },
-
-        // 2026 Inputs
-        { date: "2026-01-01", erp_code: "G8X-013-103", input_qty: 1400 },
-        { date: "2026-02-01", erp_code: "G8X-013-103", input_qty: 1500 },
-        { date: "2026-03-01", erp_code: "G8X-013-103", input_qty: 1600 },
+        { date: "2025-01-01", erp_code: "G8X-013-103", process: "Layup", status: "OK", qty: 1200 },
+        { date: "2025-01-01", erp_code: "G8X-013-103", process: "Painting", status: "OK", qty: 1100 },
+        { date: "2025-01-10", erp_code: "G8X-013-103", process: "Layup", status: "OK", qty: 1000 },
+        { date: "2025-02-01", erp_code: "G8X-013-103", process: "Layup", status: "OK", qty: 1300 },
+        { date: "2025-01-01", erp_code: "G8X-011-102", process: "Layup", status: "OK", qty: 600 },
+        { date: "2025-02-01", erp_code: "G8X-011-102", process: "Layup", status: "OK", qty: 650 },
         
-        { date: "2026-01-01", erp_code: "G8X-011-102", input_qty: 700 },
-        { date: "2026-02-01", erp_code: "G8X-011-102", input_qty: 750 },
-        { date: "2026-03-01", erp_code: "G8X-011-102", input_qty: 800 }
+        // 2026 Inputs
+        { date: "2026-01-01", erp_code: "G8X-013-103", process: "Layup", status: "OK", qty: 1400 },
+        { date: "2026-01-01", erp_code: "G8X-013-103", process: "Trimming", status: "OK", qty: 1350 },
+        { date: "2026-01-01", erp_code: "G8X-013-103", process: "Painting", status: "OK", qty: 1300 },
+        { date: "2026-01-10", erp_code: "G8X-013-103", process: "Layup", status: "OK", qty: 1400 },
+        { date: "2026-01-12", erp_code: "G8X-013-103", process: "Layup", status: "OK", qty: 1500 },
+        { date: "2026-02-01", erp_code: "G8X-013-103", process: "Layup", status: "OK", qty: 1500 },
+        { date: "2026-03-01", erp_code: "G8X-013-103", process: "Layup", status: "OK", qty: 1600 },
+        
+        { date: "2026-01-01", erp_code: "G8X-011-102", process: "Layup", status: "OK", qty: 700 },
+        { date: "2026-01-01", erp_code: "G8X-011-102", process: "Painting", status: "OK", qty: 680 },
+        { date: "2026-01-10", erp_code: "G8X-011-102", process: "Layup", status: "OK", qty: 700 },
+        { date: "2026-02-01", erp_code: "G8X-011-102", process: "Layup", status: "OK", qty: 750 },
+        { date: "2026-03-01", erp_code: "G8X-011-102", process: "Layup", status: "OK", qty: 800 }
+    ],
+    quality_data: [
+        { date: "2025-01-15", reports_8d: 5.0, sorting_action: 1.0, quality_incident: 3.0, quality: 3.0 },
+        { date: "2025-02-15", reports_8d: 5.0, sorting_action: 1.0, quality_incident: 5.0, quality: 3.7 },
+        { date: "2025-03-15", reports_8d: 5.0, sorting_action: 2.0, quality_incident: 5.0, quality: 4.0 },
+        { date: "2025-04-15", reports_8d: 5.0, sorting_action: 3.0, quality_incident: 4.0, quality: 4.0 },
+        { date: "2025-05-15", reports_8d: 2.0, sorting_action: 5.0, quality_incident: 5.0, quality: 4.0 },
+        { date: "2025-06-15", reports_8d: 5.0, sorting_action: 5.0, quality_incident: 5.0, quality: 5.0 },
+        { date: "2025-07-15", reports_8d: 5.0, sorting_action: 5.0, quality_incident: 5.0, quality: 5.0 },
+        { date: "2025-08-15", reports_8d: 2.0, sorting_action: 2.0, quality_incident: 4.0, quality: 2.7 },
+        { date: "2025-09-15", reports_8d: 5.0, sorting_action: 2.0, quality_incident: 5.0, quality: 4.0 },
+        { date: "2025-10-15", reports_8d: 5.0, sorting_action: 2.0, quality_incident: 5.0, quality: 4.0 },
+        { date: "2025-11-15", reports_8d: 5.0, sorting_action: 5.0, quality_incident: 5.0, quality: 5.0 },
+        { date: "2025-12-15", reports_8d: 5.0, sorting_action: 5.0, quality_incident: 5.0, quality: 5.0 },
+        { date: "2026-01-15", reports_8d: 5.0, sorting_action: 5.0, quality_incident: 5.0, quality: 5.0 },
+        { date: "2026-02-15", reports_8d: 5.0, sorting_action: 3.0, quality_incident: 5.0, quality: 4.3 },
+        { date: "2026-03-15", reports_8d: 5.0, sorting_action: 3.0, quality_incident: 5.0, quality: 4.3 },
+        { date: "2026-04-15", reports_8d: 5.0, sorting_action: 5.0, quality_incident: 5.0, quality: 5.0 },
+        { date: "2026-05-15", reports_8d: 5.0, sorting_action: 5.0, quality_incident: 5.0, quality: 5.0 }
+    ],
+    claim_motorrad_data: [
+        { no: 1, code_8d: "CAC-8D-25-002", date: "2025-01-20", cust: "BMW Motorrad", cust_claim_no: "Claim by E-mail", title: "Dimension NOK", customer_pn: "5B65BB9-01\n5B65BC0-01\n5B65BD0-01", cac_pn_erp: "K67-063-100\nK67-064-100\nK67-066-100", part_name: "BMW K66 Tank Blende", description: "K66 Carbonverkleidungsteile Tankabdeckung rechts: inhomogeneous trimmed edge along the parting line", claim_type: "Dimension", qty: "", status_8d: "Rejected", ref_num: "", follow_up: "Not enough information", model_code: "K67" },
+        { no: 2, code_8d: "CAC-8D-25-004", date: "2025-01-22", cust: "BMW Motorrad", cust_claim_no: "Claim by E-mail\n(A130-25-QP-317102304)", title: "Dimension NOK", customer_pn: "5B65BB7-01,\n5B65BC7-01", cac_pn_erp: "K67-069-100\nK67-070-100\nK67-071-100", part_name: "Abdeckung Airbox Carbon M", description: "Components are not dimensional fit, damaging the tank underneath.", claim_type: "Dimension", qty: "1", status_8d: "Closed", ref_num: "8D Report", follow_up: "", model_code: "K67" },
+        { no: 3, code_8d: "CAC-8D-25-005", date: "2025-01-28", cust: "BMW Motorrad", cust_claim_no: "Claim by E-mail", title: "Fender painted in carbon look area.", customer_pn: "5B5EA92-02\n5B5E949-02", cac_pn_erp: "K66-003-100\nK66-004-100", part_name: "BMW K66 Front Fender Matt", description: "Burrs detected", claim_type: "Appearance", qty: "52", status_8d: "Closed", ref_num: "8D Report", follow_up: "Document to be submitted in qWin.", model_code: "K66" },
+        { no: 4, code_8d: "CAC-8D-25-006", date: "2025-01-29", cust: "BMW Motorrad", cust_claim_no: "Claim by E-mail", title: "Unpainted area in Zone-B", customer_pn: "5B5EA92-02\n5B5E949-02", cac_pn_erp: "K66-003-100\nK66-004-100", part_name: "BMW K66 Front Fender Matt", description: "Unpainted area detected in Zone-B of carbon part.", claim_type: "Appearance", qty: "TBC", status_8d: "Rejected", ref_num: "", follow_up: "To be rejected in qWin.", model_code: "K66" },
+        { no: 5, code_8d: "CAC-8D-25-007", date: "2025-01-30", cust: "BMW Motorrad", cust_claim_no: "Claim by E-mail", title: "Insert detachment", customer_pn: "5B65BB9-01\n5B65BC0-01\n5B65BD0-01", cac_pn_erp: "K67-063-100\nK67-064-100\nK67-066-100", part_name: "BMW K66 Tank Blende", description: "The glued plastic part gets loose when BMW mount the part on the bike.", claim_type: "Function", qty: "1", status_8d: "Closed", ref_num: "8D Report", follow_up: "", model_code: "K67" },
+        { no: 6, code_8d: "CAC-8D-25-008", date: "2025-01-29", cust: "BMW Motorrad", cust_claim_no: "Claim by E-mail", title: "Label is incorrect", customer_pn: "5B5EA92-02\n5B5E949-02", cac_pn_erp: "K66-003-100\nK66-004-100", part_name: "BMW K66 Front Fender Matt", description: "Customer label is for matt part but the physical part is gloss and CAC-sticker is also gloss.", claim_type: "Function", qty: "1", status_8d: "Closed", ref_num: "8D Report", follow_up: "", model_code: "K66" },
+        { no: 7, code_8d: "CAC-8D-25-013", date: "2025-02-06", cust: "BMW Motorrad", cust_claim_no: "Claim by E-mail\n(A130-25-QP-317102193/010 : 11-Feb-25)", title: "Pin loosened after assembly", customer_pn: "5B4EBD4-01", cac_pn_erp: "K67-056-100", part_name: "BMW K6X Seitenverkleidung Oben RH", description: "The glued plastic plates and pins come off during assembly/disassembly.", claim_type: "Function", qty: "3", status_8d: "Closed", ref_num: "8D Report", follow_up: "06.02.2025: More pictures requested since 2 days but no response from customer, potentially wrong sticker only from packing, which attached outside the protective foil.", model_code: "K67" },
+        { no: 8, code_8d: "CAC-8D-25-014", date: "2025-02-15", cust: "BMW Motorrad", cust_claim_no: "Claim by E-mail", title: "Scratch on surface", customer_pn: "5B5EA92-02", cac_pn_erp: "K66-003-100", part_name: "BMW K66 Front Fender Matt", description: "Scratch on surface", claim_type: "Appearance", qty: "1", status_8d: "Closed", ref_num: "8D Report", follow_up: "", model_code: "K66" },
+        { no: 9, code_8d: "CAC-8D-25-015", date: "2025-03-10", cust: "BMW Motorrad", cust_claim_no: "Claim by E-mail", title: "Burrs on edges", customer_pn: "5B65BB9-01", cac_pn_erp: "KM3-063-100", part_name: "BMW KM3 Tank Blende", description: "Burrs on edges", claim_type: "Appearance", qty: "1", status_8d: "Closed", ref_num: "8D Report", follow_up: "", model_code: "KM3" },
+        { no: 10, code_8d: "CAC-8D-25-016", date: "2025-04-12", cust: "BMW Motorrad", cust_claim_no: "Claim by E-mail", title: "Fender delamination", customer_pn: "5B65BB7-01", cac_pn_erp: "K69-069-100", part_name: "Abdeckung Airbox Carbon M", description: "Fender delamination", claim_type: "Appearance", qty: "2", status_8d: "Closed", ref_num: "8D Report", follow_up: "", model_code: "K69" },
+        { no: 11, code_8d: "CAC-8D-25-017", date: "2025-04-18", cust: "BMW Motorrad", cust_claim_no: "Claim by E-mail", title: "Loose pin", customer_pn: "5B65BB7-01", cac_pn_erp: "K69-070-100", part_name: "Abdeckung Airbox Carbon M", description: "Loose pin", claim_type: "Function", qty: "1", status_8d: "Closed", ref_num: "8D Report", follow_up: "", model_code: "K69" },
+        { no: 12, code_8d: "CAC-8D-25-018", date: "2025-04-20", cust: "BMW Motorrad", cust_claim_no: "Claim by E-mail", title: "Dimension NOK", customer_pn: "5B65BB9-01", cac_pn_erp: "K67-063-100", part_name: "BMW K66 Tank Blende", description: "Dimension NOK", claim_type: "Dimension", qty: "1", status_8d: "Closed", ref_num: "8D Report", follow_up: "", model_code: "K67" },
+        { no: 13, code_8d: "CAC-8D-25-019", date: "2025-06-05", cust: "BMW Motorrad", cust_claim_no: "Claim by E-mail", title: "Other issue", customer_pn: "5B65BB7-01", cac_pn_erp: "K69-071-100", part_name: "Abdeckung Airbox Carbon M", description: "Other issue", claim_type: "Others", qty: "1", status_8d: "Closed", ref_num: "8D Report", follow_up: "", model_code: "K69" },
+        { no: 14, code_8d: "CAC-8D-25-020", date: "2025-07-22", cust: "BMW Motorrad", cust_claim_no: "Claim by E-mail", title: "Burrs detected", customer_pn: "5B65BB7-01", cac_pn_erp: "K69-071-100", part_name: "Abdeckung Airbox Carbon M", description: "Burrs detected", claim_type: "Appearance", qty: "1", status_8d: "Closed", ref_num: "8D Report", follow_up: "", model_code: "K69" },
+        { no: 15, code_8d: "CAC-8D-25-021", date: "2025-10-15", cust: "BMW Motorrad", cust_claim_no: "Claim by E-mail", title: "Dust inclusion", customer_pn: "5B65BB9-01", cac_pn_erp: "KM3-063-100", part_name: "BMW KM3 Tank Blende", description: "Dust inclusion", claim_type: "Appearance", qty: "1", status_8d: "Closed", ref_num: "8D Report", follow_up: "", model_code: "KM3" },
+        { no: 16, code_8d: "CAC-8D-26-001", date: "2026-02-10", cust: "BMW Motorrad", cust_claim_no: "Claim by E-mail", title: "Loose pin", customer_pn: "5B65BB7-01", cac_pn_erp: "K69-071-100", part_name: "Abdeckung Airbox Carbon M", description: "Loose pin", claim_type: "Function", qty: "1", status_8d: "Open", ref_num: "", follow_up: "", model_code: "K69" },
+        { no: 17, code_8d: "CAC-8D-26-002", date: "2026-03-12", cust: "BMW Motorrad", cust_claim_no: "Claim by E-mail", title: "Pin loosening", customer_pn: "5B65BB9-01", cac_pn_erp: "K67-063-100", part_name: "BMW K66 Tank Blende", description: "Pin loosening", claim_type: "Function", qty: "1", status_8d: "NTF", ref_num: "", follow_up: "", model_code: "K67" },
+        { no: 18, code_8d: "CAC-8D-26-003", date: "2026-05-18", cust: "BMW Motorrad", cust_claim_no: "Claim by E-mail", title: "Deformation detected", customer_pn: "5B65BB9-01", cac_pn_erp: "K67-063-100", part_name: "BMW K66 Tank Blende", description: "Deformation detected", claim_type: "Deformation", qty: "1", status_8d: "Closed", ref_num: "8D Report", follow_up: "", model_code: "K67" }
     ]
 };

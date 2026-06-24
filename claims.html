@@ -24,10 +24,11 @@
         <main>
             <div class="filters-bar">
                 <div class="filter-group">
-                    <label for="claims-project">Select Project</label>
-                    <select id="claims-project">
-                        <option value="All">All Projects</option>
-                    </select>
+                    <label>Select Project</label>
+                    <div class="multiselect-dropdown" id="claims-project-dropdown">
+                        <button class="multiselect-btn" id="claims-project-btn" type="button">All Projects</button>
+                        <div class="multiselect-options" id="claims-project-options" style="display: none;"></div>
+                    </div>
                 </div>
                 <div class="filter-group">
                     <label for="claims-quarter">Select Quarter</label>
@@ -55,8 +56,8 @@
                         <canvas id="claimTypeChart"></canvas>
                     </div>
                     <div style="margin-top: 1rem; display: flex; justify-content: space-around; font-size: 0.85rem; font-weight: 600;">
-                        <div style="color: var(--accent-bronze);">Total 2025: <span id="total-2025-type">0</span> pcs</div>
-                        <div style="color: var(--accent-blue);">Total 2026: <span id="total-2026-type">0</span> pcs</div>
+                        <div style="color: var(--accent-bronze);"><span id="label-prev-year-type">Total 2025</span>: <span id="total-2025-type">0</span> pcs</div>
+                        <div style="color: var(--accent-blue);"><span id="label-curr-year-type">Total 2026</span>: <span id="total-2026-type">0</span> pcs</div>
                     </div>
                 </div>
 
@@ -72,8 +73,8 @@
                         <canvas id="claimLocationChart"></canvas>
                     </div>
                     <div style="margin-top: 1rem; display: flex; justify-content: space-around; font-size: 0.85rem; font-weight: 600;">
-                        <div style="color: var(--accent-bronze);">Total 2025: <span id="total-2025-loc">0</span> pcs</div>
-                        <div style="color: var(--accent-blue);">Total 2026: <span id="total-2026-loc">0</span> pcs</div>
+                        <div style="color: var(--accent-bronze);"><span id="label-prev-year-loc">Total 2025</span>: <span id="total-2025-loc">0</span> pcs</div>
+                        <div style="color: var(--accent-blue);"><span id="label-curr-year-loc">Total 2026</span>: <span id="total-2026-loc">0</span> pcs</div>
                     </div>
                 </div>
             </div>
@@ -92,8 +93,8 @@
                                 <th>Project</th>
                                 <th>Claimed Type</th>
                                 <th>Location</th>
-                                <th>Quantity (2025)</th>
-                                <th>Quantity (2026)</th>
+                                <th id="th-prev-year-qty">Quantity (2025)</th>
+                                <th id="th-curr-year-qty">Quantity (2026)</th>
                             </tr>
                         </thead>
                         <tbody id="claims-table-body">

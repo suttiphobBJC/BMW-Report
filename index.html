@@ -13,6 +13,251 @@
     <link rel="stylesheet" href="styles.css">
     <!-- Lucide Icons -->
     <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <style>
+        .profile-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .profile-btn.active {
+            background: var(--accent-blue);
+            color: #ffffff;
+            border-color: var(--accent-blue);
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.25);
+        }
+        .profile-btn:hover:not(.active) {
+            background: var(--accent-blue-light);
+            color: var(--accent-blue);
+        }
+
+        .kpi-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 140px;
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+        }
+        .kpi-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .kpi-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .kpi-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+        }
+        .kpi-value-container {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: auto;
+        }
+        .kpi-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+        }
+        .kpi-subvalue {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            display: block;
+        }
+        .kpi-trend {
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .kpi-trend-sub {
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.2;
+            margin-top: 0.1rem;
+        }
+
+        /* Card States and Luminous Palette */
+        .kpi-card.state-green {
+            background: #f0fdf4 !important;
+            border-color: #86efac !important;
+        }
+        .kpi-card.state-green .kpi-label {
+            color: #166534 !important;
+        }
+        .kpi-card.state-green .kpi-value, .kpi-card.state-green .kpi-subvalue {
+            color: #14532d !important;
+        }
+        .kpi-card.state-green .kpi-trend, .kpi-card.state-green .kpi-trend-sub {
+            color: #15803d !important;
+        }
+        .kpi-card.state-green .kpi-icon {
+            background: #dcfce7 !important;
+            color: #15803d !important;
+        }
+
+        .kpi-card.state-red {
+            background: #fef2f2 !important;
+            border-color: #fca5a5 !important;
+        }
+        .kpi-card.state-red .kpi-label {
+            color: #991b1b !important;
+        }
+        .kpi-card.state-red .kpi-value, .kpi-card.state-red .kpi-subvalue {
+            color: #7f1d1d !important;
+        }
+        .kpi-card.state-red .kpi-trend, .kpi-card.state-red .kpi-trend-sub {
+            color: #b91c1c !important;
+        }
+        .kpi-card.state-red .kpi-icon {
+            background: #fee2e2 !important;
+            color: #b91c1c !important;
+        }
+
+        .kpi-card.state-blue {
+            background: #eff6ff !important;
+            border-color: #93c5fd !important;
+        }
+        .kpi-card.state-blue .kpi-label {
+            color: #1e40af !important;
+        }
+        .kpi-card.state-blue .kpi-value, .kpi-card.state-blue .kpi-subvalue {
+            color: #1e3a8a !important;
+        }
+        .kpi-card.state-blue .kpi-trend, .kpi-card.state-blue .kpi-trend-sub {
+            color: #1d4ed8 !important;
+        }
+        .kpi-card.state-blue .kpi-icon {
+            background: #dbeafe !important;
+            color: #1d4ed8 !important;
+        }
+
+        .kpi-card.state-yellow {
+            background: #fffbeb !important;
+            border-color: #fde047 !important;
+        }
+        .kpi-card.state-yellow .kpi-label {
+            color: #854d0e !important;
+        }
+        .kpi-card.state-yellow .kpi-value, .kpi-card.state-yellow .kpi-subvalue {
+            color: #713f12 !important;
+        }
+        .kpi-card.state-yellow .kpi-trend, .kpi-card.state-yellow .kpi-trend-sub {
+            color: #a16207 !important;
+        }
+        .kpi-card.state-yellow .kpi-icon {
+            background: #fef9c3 !important;
+            color: #a16207 !important;
+        }
+
+        /* Dark Mode overrides for States */
+        [data-theme="dark"] .kpi-card.state-green {
+            background: #022c22 !important;
+            border-color: #059669 !important;
+        }
+        [data-theme="dark"] .kpi-card.state-green .kpi-label {
+            color: #a7f3d0 !important;
+        }
+        [data-theme="dark"] .kpi-card.state-green .kpi-value, [data-theme="dark"] .kpi-card.state-green .kpi-subvalue {
+            color: #ecfdf5 !important;
+        }
+        [data-theme="dark"] .kpi-card.state-green .kpi-trend, [data-theme="dark"] .kpi-card.state-green .kpi-trend-sub {
+            color: #34d399 !important;
+        }
+        [data-theme="dark"] .kpi-card.state-green .kpi-icon {
+            background: #064e3b !important;
+            color: #34d399 !important;
+        }
+
+        [data-theme="dark"] .kpi-card.state-red {
+            background: #450a0a !important;
+            border-color: #dc2626 !important;
+        }
+        [data-theme="dark"] .kpi-card.state-red .kpi-label {
+            color: #fecaca !important;
+        }
+        [data-theme="dark"] .kpi-card.state-red .kpi-value, [data-theme="dark"] .kpi-card.state-red .kpi-subvalue {
+            color: #fef2f2 !important;
+        }
+        [data-theme="dark"] .kpi-card.state-red .kpi-trend, [data-theme="dark"] .kpi-card.state-red .kpi-trend-sub {
+            color: #f87171 !important;
+        }
+        [data-theme="dark"] .kpi-card.state-red .kpi-icon {
+            background: #7f1d1d !important;
+            color: #f87171 !important;
+        }
+
+        [data-theme="dark"] .kpi-card.state-blue {
+            background: #172554 !important;
+            border-color: #2563eb !important;
+        }
+        [data-theme="dark"] .kpi-card.state-blue .kpi-label {
+            color: #bfdbfe !important;
+        }
+        [data-theme="dark"] .kpi-card.state-blue .kpi-value, [data-theme="dark"] .kpi-card.state-blue .kpi-subvalue {
+            color: #eff6ff !important;
+        }
+        [data-theme="dark"] .kpi-card.state-blue .kpi-trend, [data-theme="dark"] .kpi-card.state-blue .kpi-trend-sub {
+            color: #60a5fa !important;
+        }
+        [data-theme="dark"] .kpi-card.state-blue .kpi-icon {
+            background: #1e3a8a !important;
+            color: #60a5fa !important;
+        }
+
+        [data-theme="dark"] .kpi-card.state-yellow {
+            background: #422006 !important;
+            border-color: #ca8a04 !important;
+        }
+        [data-theme="dark"] .kpi-card.state-yellow .kpi-label {
+            color: #fef9c3 !important;
+        }
+        [data-theme="dark"] .kpi-card.state-yellow .kpi-value, [data-theme="dark"] .kpi-card.state-yellow .kpi-subvalue {
+            color: #fef08a !important;
+        }
+        [data-theme="dark"] .kpi-card.state-yellow .kpi-trend, [data-theme="dark"] .kpi-card.state-yellow .kpi-trend-sub {
+            color: #facc15 !important;
+        }
+        [data-theme="dark"] .kpi-card.state-yellow .kpi-icon {
+            background: #713f12 !important;
+            color: #facc15 !important;
+        }
+    </style>
 </head>
 <body>
     <!-- Sidebar Container -->
@@ -25,7 +270,7 @@
 
         <!-- Main Content -->
         <main>
-            <div class="card" style="background: linear-gradient(135deg, var(--accent-blue) 0%, #004d88 100%); color: #ffffff; border: none; padding: 2.5rem; position: relative; overflow: hidden;">
+            <div class="card" style="background: linear-gradient(135deg, var(--accent-blue) 0%, #004d88 100%); color: #ffffff; border: none; padding: 2.5rem; position: relative; overflow: hidden; margin-bottom: 2rem;">
                 <div style="position: relative; z-index: 2; max-width: 60%;">
                     <h2 style="font-size: 2rem; margin-bottom: 0.5rem; font-family: 'Outfit', sans-serif;">BMW Quality Portal</h2>
                     <p style="opacity: 0.9; font-size: 1rem; line-height: 1.6;">
@@ -41,12 +286,24 @@
                 </div>
             </div>
 
+            <!-- Profile Toggles Bar -->
+            <div style="display: flex; gap: 0.75rem; margin-bottom: 2rem; background: var(--bg-secondary); padding: 0.4rem; border-radius: 12px; border: 1px solid var(--border-color); width: fit-content; box-shadow: var(--card-shadow);">
+                <button class="profile-btn active" id="btn-g8x" onclick="setProfile('G8X')">G8X Profile</button>
+                <button class="profile-btn" id="btn-motorrad" onclick="setProfile('Motorrad')">Motorrad Profile</button>
+            </div>
+
+            <!-- Profile Banner Title -->
+            <div style="margin-bottom: 2rem;">
+                <h3 id="profile-title" style="font-size: 1.5rem; font-weight: 700; font-family: 'Outfit', sans-serif; color: var(--text-primary); margin: 0;">G8X Dashboard Summary</h3>
+                <p id="profile-subtitle" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">Real-time quality indicators and comparative benchmarks for the G8X platform.</p>
+            </div>
+
             <!-- Dashboard Big Logo & Status Overview -->
-            <div class="grid-2col" style="margin-bottom: 2rem; align-items: stretch;">
-                <div class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 3rem 2rem;">
-                    <div class="dashboard-logo-container" style="background-color: var(--accent-blue-light); border-radius: 50%; width: 160px; height: 160px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+            <div class="grid-2col" style="margin-bottom: 2.5rem; align-items: stretch;">
+                <div class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2.5rem 2rem;">
+                    <div class="dashboard-logo-container" style="background-color: var(--accent-blue-light); border-radius: 50%; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;">
                         <!-- Large Circular Classic Logo -->
-                        <svg width="120" height="120" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                             <!-- Outer thick dark grey border -->
                             <circle cx="50" cy="50" r="48" fill="#7f7f7f" />
                             <!-- White inner ring -->
@@ -73,8 +330,8 @@
                             <text x="74" y="24" font-family="'Outfit', 'Arial Black', sans-serif" font-weight="900" font-size="10" fill="#475569" text-anchor="middle" transform="rotate(38 74 24)">W</text>
                         </svg>
                     </div>
-                    <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; font-family: 'Outfit', sans-serif;">Production & Quality Portal</h3>
-                    <p style="color: var(--text-secondary); max-width: 320px;">Official BMW Carbon Fiber Reinforcements Quality Tracking & Reporting System.</p>
+                    <h3 style="font-size: 1.35rem; margin-bottom: 0.5rem; font-family: 'Outfit', sans-serif;" id="operations-logo-title">G8X Production</h3>
+                    <p style="color: var(--text-secondary); max-width: 320px; font-size: 0.9rem;" id="operations-logo-desc">Official BMW Carbon Fiber Reinforcements Quality Tracking & Reporting System.</p>
                 </div>
 
                 <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
@@ -82,8 +339,8 @@
                         <h3 class="card-title">Operations Summary</h3>
                         <span id="summary-period" class="user-role" style="font-size: 0.85rem; background-color: var(--border-color); padding: 0.25rem 0.75rem; border-radius: 20px;">Latest Data</span>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; flex-grow: 1;">
-                        <div style="background-color: var(--bg-primary); padding: 1.25rem; border-radius: 12px; display: flex; flex-direction: column; justify-content: center;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; flex-grow: 1;" id="summary-grid-container">
+                        <div style="background-color: var(--bg-primary); padding: 1.25rem; border-radius: 12px; display: flex; flex-direction: column; justify-content: center;" id="summary-ppm-box">
                             <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">PPM Avg</span>
                             <span id="summary-ppm" style="font-size: 1.5rem; font-weight: 700; color: var(--accent-blue); font-family: 'Outfit', sans-serif;">0.00</span>
                         </div>
@@ -91,7 +348,7 @@
                             <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">FPY Yield</span>
                             <span id="summary-yield" style="font-size: 1.5rem; font-weight: 700; color: var(--color-success); font-family: 'Outfit', sans-serif;">0.0%</span>
                         </div>
-                        <div style="background-color: var(--bg-primary); padding: 1.25rem; border-radius: 12px; display: flex; flex-direction: column; justify-content: center;">
+                        <div style="background-color: var(--bg-primary); padding: 1.25rem; border-radius: 12px; display: flex; flex-direction: column; justify-content: center;" id="summary-wip-box">
                             <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Total WIP</span>
                             <span id="summary-wip" style="font-size: 1.5rem; font-weight: 700; color: var(--color-warning); font-family: 'Outfit', sans-serif;">0</span>
                         </div>
@@ -103,46 +360,165 @@
                 </div>
             </div>
 
-            <!-- Primary KPI Dashboard Cards -->
-            <div class="dashboard-grid">
-                <!-- PPM Stat Card -->
-                <div class="stat-card">
-                    <div class="stat-info">
-                        <span class="stat-label">PPM (Parts Per Million)</span>
-                        <span id="card-ppm-val" class="stat-value">12.5</span>
-                        <span class="stat-change down"><i data-lucide="trending-down"></i> -8.2% vs last month</span>
+            <!-- Section 1: PPM -->
+            <div style="margin-bottom: 2.5rem;" id="ppm-section-container">
+                <h4 style="font-size: 1.15rem; font-weight: 700; font-family: 'Outfit', sans-serif; margin-bottom: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="bar-chart-3" style="color: var(--accent-blue); width: 20px; height: 20px;"></i> PPM PERFORMANCE (PARTS PER MILLION)
+                </h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+                    <!-- PPM Box 1: vs Target -->
+                    <div class="kpi-card" id="ppm-box-target">
+                        <div class="kpi-card-header">
+                            <span class="kpi-label">PPM THIS MONTH VS TARGET (5,500)</span>
+                            <span class="kpi-icon"><i data-lucide="target" style="width: 16px; height: 16px;"></i></span>
+                        </div>
+                        <div class="kpi-value-container">
+                            <span class="kpi-value" id="ppm-target-val">-</span>
+                            <span class="kpi-trend" id="ppm-target-trend"></span>
+                        </div>
                     </div>
-                    <div class="stat-icon"><i data-lucide="bar-chart-3"></i></div>
+                    <!-- PPM Box 2: MoM -->
+                    <div class="kpi-card" id="ppm-box-mom">
+                        <div class="kpi-card-header">
+                            <span class="kpi-label">PPM Month-on-Month</span>
+                            <span class="kpi-icon"><i data-lucide="calendar" style="width: 16px; height: 16px;"></i></span>
+                        </div>
+                        <div class="kpi-value-container">
+                            <span class="kpi-value" id="ppm-mom-val">-</span>
+                            <span class="kpi-trend" id="ppm-mom-trend"></span>
+                        </div>
+                    </div>
+                    <!-- PPM Box 3: YoY Quarter -->
+                    <div class="kpi-card" id="ppm-box-qoq">
+                        <div class="kpi-card-header">
+                            <span class="kpi-label">PPM Year-over-Year Quarter</span>
+                            <span class="kpi-icon"><i data-lucide="trending-up" style="width: 16px; height: 16px;"></i></span>
+                        </div>
+                        <div class="kpi-value-container">
+                            <span class="kpi-value" id="ppm-qoq-val">-</span>
+                            <span class="kpi-trend" id="ppm-qoq-trend"></span>
+                        </div>
+                    </div>
                 </div>
+            </div>
 
-                <!-- Yield Card -->
-                <div class="stat-card">
-                    <div class="stat-info">
-                        <span class="stat-label">First Part Yield (FPY)</span>
-                        <span id="card-yield-val" class="stat-value">92.8%</span>
-                        <span class="stat-change up"><i data-lucide="trending-up"></i> +1.5% vs last month</span>
+            <!-- Section 2: FPY & FY Yield -->
+            <div style="margin-bottom: 2.5rem;">
+                <h4 style="font-size: 1.15rem; font-weight: 700; font-family: 'Outfit', sans-serif; margin-bottom: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="gauge" style="color: var(--color-success); width: 20px; height: 20px;"></i> FPY & FY YIELD (ALL PROCESSES COMBINED)
+                </h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem;">
+                    <!-- Yield Box 1: MoM -->
+                    <div class="kpi-card" id="yield-box-mom">
+                        <div class="kpi-card-header">
+                            <span class="kpi-label">Yield Month-on-Month</span>
+                            <span class="kpi-icon"><i data-lucide="calendar" style="width: 16px; height: 16px;"></i></span>
+                        </div>
+                        <div style="display: flex; gap: 2rem; margin-top: auto; padding-top: 1rem;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">FPY</div>
+                                <span class="kpi-subvalue" id="yield-fpy-mom-val" style="margin-top: 0.15rem;">-</span>
+                                <div class="kpi-trend-sub" id="yield-fpy-mom-trend" style="margin-top: 0.25rem;"></div>
+                            </div>
+                            <div style="border-left: 1px solid var(--border-color); padding-left: 2rem; flex: 1;">
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">FY</div>
+                                <span class="kpi-subvalue" id="yield-fy-mom-val" style="margin-top: 0.15rem;">-</span>
+                                <div class="kpi-trend-sub" id="yield-fy-mom-trend" style="margin-top: 0.25rem;"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-icon"><i data-lucide="gauge"></i></div>
+                    <!-- Yield Box 2: YoY Quarter -->
+                    <div class="kpi-card" id="yield-box-qoq">
+                        <div class="kpi-card-header">
+                            <span class="kpi-label">Yield Year-over-Year Quarter</span>
+                            <span class="kpi-icon"><i data-lucide="trending-up" style="width: 16px; height: 16px;"></i></span>
+                        </div>
+                        <div style="display: flex; gap: 2rem; margin-top: auto; padding-top: 1rem;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">FPY</div>
+                                <span class="kpi-subvalue" id="yield-fpy-qoq-val" style="margin-top: 0.15rem;">-</span>
+                                <div class="kpi-trend-sub" id="yield-fpy-qoq-trend" style="margin-top: 0.25rem;"></div>
+                            </div>
+                            <div style="border-left: 1px solid var(--border-color); padding-left: 2rem; flex: 1;">
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">FY</div>
+                                <span class="kpi-subvalue" id="yield-fy-qoq-val" style="margin-top: 0.15rem;">-</span>
+                                <div class="kpi-trend-sub" id="yield-fy-qoq-trend" style="margin-top: 0.25rem;"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
 
-                <!-- WIP Card -->
-                <div class="stat-card">
-                    <div class="stat-info">
-                        <span class="stat-label">Active WIP (LHD/RHD)</span>
-                        <span id="card-wip-val" class="stat-value">3,420</span>
-                        <span class="stat-change down"><i data-lucide="trending-down"></i> -1.2% reduction</span>
+            <!-- Section 3: WIP (G8X Only) -->
+            <div id="wip-section" style="margin-bottom: 2.5rem;">
+                <h4 style="font-size: 1.15rem; font-weight: 700; font-family: 'Outfit', sans-serif; margin-bottom: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="boxes" style="color: var(--color-warning); width: 20px; height: 20px;"></i> WIP CONTROL (G8X ONLY)
+                </h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+                    <!-- LHD Control -->
+                    <div class="kpi-card" id="wip-box-lhd">
+                        <div class="kpi-card-header">
+                            <span class="kpi-label">LHD WIP Control</span>
+                            <span class="kpi-icon"><i data-lucide="layers" style="width: 16px; height: 16px;"></i></span>
+                        </div>
+                        <div class="kpi-value-container">
+                            <span class="kpi-value" id="wip-lhd-val">-</span>
+                            <span class="kpi-trend" id="wip-lhd-trend"></span>
+                        </div>
                     </div>
-                    <div class="stat-icon"><i data-lucide="boxes"></i></div>
+                    <!-- RHD Control -->
+                    <div class="kpi-card" id="wip-box-rhd">
+                        <div class="kpi-card-header">
+                            <span class="kpi-label">RHD WIP Control</span>
+                            <span class="kpi-icon"><i data-lucide="layers" style="width: 16px; height: 16px;"></i></span>
+                        </div>
+                        <div class="kpi-value-container">
+                            <span class="kpi-value" id="wip-rhd-val">-</span>
+                            <span class="kpi-trend" id="wip-rhd-trend"></span>
+                        </div>
+                    </div>
+                    <!-- Diffuser Control -->
+                    <div class="kpi-card" id="wip-box-diffuser">
+                        <div class="kpi-card-header">
+                            <span class="kpi-label">Diffuser WIP Control</span>
+                            <span class="kpi-icon"><i data-lucide="layers" style="width: 16px; height: 16px;"></i></span>
+                        </div>
+                        <div class="kpi-value-container">
+                            <span class="kpi-value" id="wip-diffuser-val">-</span>
+                            <span class="kpi-trend" id="wip-diffuser-trend"></span>
+                        </div>
+                    </div>
                 </div>
+            </div>
 
-                <!-- Scrap Card -->
-                <div class="stat-card">
-                    <div class="stat-info">
-                        <span class="stat-label">Scrap Rate</span>
-                        <span id="card-scrap-val" class="stat-value">1.45%</span>
-                        <span class="stat-change up"><i data-lucide="trending-down"></i> -0.3% vs target</span>
+            <!-- Section 4: Scrap -->
+            <div style="margin-bottom: 2.5rem;">
+                <h4 style="font-size: 1.15rem; font-weight: 700; font-family: 'Outfit', sans-serif; margin-bottom: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="trash-2" style="color: var(--color-danger); width: 20px; height: 20px;"></i> SCRAP RATE PERFORMANCE (TOTAL SCRAP)
+                </h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem;">
+                    <!-- Scrap Box 1: MoM -->
+                    <div class="kpi-card" id="scrap-box-mom">
+                        <div class="kpi-card-header">
+                            <span class="kpi-label">Scrap Rate Month-on-Month</span>
+                            <span class="kpi-icon"><i data-lucide="calendar" style="width: 16px; height: 16px;"></i></span>
+                        </div>
+                        <div class="kpi-value-container">
+                            <span class="kpi-value" id="scrap-mom-val">-</span>
+                            <span class="kpi-trend" id="scrap-mom-trend"></span>
+                        </div>
                     </div>
-                    <div class="stat-icon"><i data-lucide="trash-2"></i></div>
+                    <!-- Scrap Box 2: QoQ -->
+                    <div class="kpi-card" id="scrap-box-qoq">
+                        <div class="kpi-card-header">
+                            <span class="kpi-label">Scrap Rate Year-over-Year Quarter</span>
+                            <span class="kpi-icon"><i data-lucide="trending-up" style="width: 16px; height: 16px;"></i></span>
+                        </div>
+                        <div class="kpi-value-container">
+                            <span class="kpi-value" id="scrap-qoq-val">-</span>
+                            <span class="kpi-trend" id="scrap-qoq-trend"></span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -152,133 +528,601 @@
     <script src="js/mock-data.js"></script>
     <script src="js/common.js"></script>
     <script>
-        // Inject Layout and Calculate Home Stats
-        document.addEventListener('DOMContentLoaded', () => {
-            injectLayout("Operations Dashboard");
+        let activeProfile = 'G8X';
+
+        function setProfile(profile) {
+            activeProfile = profile;
             
-            // Calculate Home Page Summary Statistics dynamically
-            try {
-                // 1. PPM Avg (Latest Year in Data)
-                const ppmDataAll = db.get('ppm_data') || [];
-                if (ppmDataAll.length > 0) {
-                    const years = ppmDataAll.map(d => {
-                        const date = new Date(d.date);
-                        return isNaN(date.getTime()) ? null : date.getFullYear();
-                    }).filter(y => y);
-                    const latestYear = years.length > 0 ? Math.max(...years) : 2026;
-                    const ppmData = ppmDataAll.filter(d => new Date(d.date).getFullYear() === latestYear);
-                    if (ppmData.length > 0) {
-                        const totalDefect = ppmData.reduce((sum, d) => sum + Number(d.defect_qty), 0);
-                        const totalShipped = ppmData.reduce((sum, d) => sum + Number(d.shipped_qty), 0);
-                        const ppmAvg = totalShipped > 0 ? ((totalDefect / totalShipped) * 1000000).toFixed(2) : "0.00";
-                        document.getElementById('summary-ppm').textContent = parseFloat(ppmAvg).toLocaleString(undefined, {minimumFractionDigits: 2});
-                        document.getElementById('card-ppm-val').textContent = parseFloat(ppmAvg).toLocaleString(undefined, {minimumFractionDigits: 2});
-                        
-                        const labelEl = document.querySelector('.stat-card:nth-child(1) .stat-label');
-                        if (labelEl) labelEl.textContent = `PPM Avg (${latestYear})`;
-                        const subEl = document.querySelector('.stat-card:nth-child(1) .stat-change');
-                        if (subEl) subEl.innerHTML = `<i data-lucide="info"></i> Total shipped: ${totalShipped.toLocaleString()} pcs`;
-                    }
-                }
+            // Toggle active class on buttons
+            const btnG8x = document.getElementById('btn-g8x');
+            const btnMotorrad = document.getElementById('btn-motorrad');
+            if (btnG8x) btnG8x.classList.toggle('active', profile === 'G8X');
+            if (btnMotorrad) btnMotorrad.classList.toggle('active', profile === 'Motorrad');
+
+            // Update titles
+            const titleEl = document.getElementById('profile-title');
+            const subtitleEl = document.getElementById('profile-subtitle');
+            const logoTitleEl = document.getElementById('operations-logo-title');
+            const logoDescEl = document.getElementById('operations-logo-desc');
+
+            const ppmSection = document.getElementById('ppm-section-container');
+            const ppmSummaryBox = document.getElementById('summary-ppm-box');
+            const summaryGrid = document.getElementById('summary-grid-container');
+
+            if (profile === 'G8X') {
+                if (titleEl) titleEl.textContent = "G8X Dashboard Summary";
+                if (subtitleEl) subtitleEl.textContent = "Real-time quality indicators and comparative benchmarks for the G8X platform.";
+                if (logoTitleEl) logoTitleEl.textContent = "G8X Production";
+                if (logoDescEl) logoDescEl.textContent = "Official BMW Carbon Fiber Reinforcements Quality Tracking & Reporting System.";
                 
-                // 2. Yield FPY Avg (Latest Year in Data)
-                const yieldDataAll = db.get('yield_fpy_data') || [];
-                if (yieldDataAll.length > 0) {
-                    const yieldYears = yieldDataAll.map(d => {
-                        if (!d.date) return null;
-                        const p = d.date.split('-');
-                        return Number(p[0]);
-                    }).filter(y => y && !isNaN(y));
-                    const latestYieldYear = yieldYears.length > 0 ? Math.max(...yieldYears) : 2026;
-                    const yieldData = yieldDataAll.filter(d => d.date && d.date.startsWith(latestYieldYear.toString()));
-                    if (yieldData.length > 0) {
-                        const layupData = yieldData.filter(d => d.process.toLowerCase() === 'layup');
-                        const dataToUse = layupData.length > 0 ? layupData : yieldData;
-                        const processName = layupData.length > 0 ? 'Layup' : dataToUse[0].process;
-                        
-                        let sumFpy = 0, countFpy = 0;
-                        dataToUse.forEach(d => {
-                            if (d.yield !== undefined && d.yield !== null) {
-                                sumFpy += Number(d.yield);
-                                countFpy++;
-                            } else if (Number(d.ins) > 0) {
-                                sumFpy += (Number(d.ok) / Number(d.ins)) * 100;
-                                countFpy++;
+                if (ppmSection) ppmSection.style.display = 'block';
+                if (ppmSummaryBox) ppmSummaryBox.style.display = 'flex';
+                if (summaryGrid) summaryGrid.style.gridTemplateColumns = '1fr 1fr';
+            } else {
+                if (titleEl) titleEl.textContent = "Motorrad Dashboard Summary";
+                if (subtitleEl) subtitleEl.textContent = "Real-time quality indicators and comparative benchmarks for the Motorrad platform.";
+                if (logoTitleEl) logoTitleEl.textContent = "Motorrad Production";
+                if (logoDescEl) logoDescEl.textContent = "Official BMW Motorrad Quality Tracking & Reporting System.";
+                
+                if (ppmSection) ppmSection.style.display = 'none';
+                if (ppmSummaryBox) ppmSummaryBox.style.display = 'none';
+                if (summaryGrid) summaryGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            }
+
+            recalculateStats();
+        }
+
+        function getPrevMonthStr(monthStr) {
+            const [y, m] = monthStr.split('-').map(Number);
+            let py = y, pm = m - 1;
+            if (pm === 0) { pm = 12; py = y - 1; }
+            return `${py}-${String(pm).padStart(2, '0')}`;
+        }
+
+        function recalculateStats() {
+            try {
+                // helper to set card state and value
+                function updateCardState(cardId, valueId, trendId, valueText, trendHTML, stateClass) {
+                    const card = document.getElementById(cardId);
+                    const valEl = document.getElementById(valueId);
+                    const trendEl = document.getElementById(trendId);
+                    if (valEl) valEl.textContent = valueText;
+                    if (trendEl) trendEl.innerHTML = trendHTML;
+                    if (card) {
+                        card.className = 'kpi-card ' + stateClass;
+                    }
+                }
+
+                // ==========================================
+                // 1. PPM Performance
+                // ==========================================
+                const ppmDataAll = db.get('ppm_data') || [];
+                const profilePpm = ppmDataAll.filter(d => {
+                    const isG8X = (d.customer && (d.customer.toLowerCase().includes('smr') || d.customer.toLowerCase().includes('smp'))) || 
+                                  (d.code && d.code.toLowerCase().includes('g8x'));
+                    return activeProfile === 'G8X' ? isG8X : !isG8X;
+                });
+
+                const monthlyPpm = {};
+                profilePpm.forEach(d => {
+                    if (!d.date) return;
+                    const monthStr = d.date.substring(0, 7);
+                    if (!monthlyPpm[monthStr]) {
+                        monthlyPpm[monthStr] = { defect: 0, shipped: 0 };
+                    }
+                    monthlyPpm[monthStr].defect += Number(d.defect_qty || 0);
+                    monthlyPpm[monthStr].shipped += Number(d.shipped_qty || 0);
+                });
+
+                const ppmMonthsSorted = Object.keys(monthlyPpm).sort();
+                let ppmLatest = null;
+                let ppmPrev = null;
+                let latestMonthStr = '';
+                
+                if (ppmMonthsSorted.length > 0) {
+                    latestMonthStr = ppmMonthsSorted[ppmMonthsSorted.length - 1];
+                    const latestPpmData = monthlyPpm[latestMonthStr];
+                    if (latestPpmData.shipped > 0) {
+                        ppmLatest = (latestPpmData.defect / latestPpmData.shipped) * 1000000;
+                    }
+
+                    const prevMonthStr = getPrevMonthStr(latestMonthStr);
+                    const prevPpmData = monthlyPpm[prevMonthStr] || (ppmMonthsSorted.length > 1 ? monthlyPpm[ppmMonthsSorted[ppmMonthsSorted.length - 2]] : null);
+                    if (prevPpmData && prevPpmData.shipped > 0) {
+                        ppmPrev = (prevPpmData.defect / prevPpmData.shipped) * 1000000;
+                    }
+                }
+
+                // 1.1 PPM vs Target (5,500)
+                if (ppmLatest !== null) {
+                    const target = 5500;
+                    const diffPct = ((ppmLatest - target) / target) * 100;
+                    const valText = Math.round(ppmLatest).toLocaleString();
+                    let trendHTML = '';
+                    let stateClass = 'state-blue';
+                    if (ppmLatest < target) {
+                        stateClass = 'state-green';
+                        trendHTML = `<i data-lucide="trending-down"></i> ${Math.abs(diffPct).toFixed(1)}% below target`;
+                    } else if (ppmLatest > target) {
+                        stateClass = 'state-red';
+                        trendHTML = `<i data-lucide="trending-up"></i> ${Math.abs(diffPct).toFixed(1)}% above target`;
+                    } else {
+                        trendHTML = `On target`;
+                    }
+                    updateCardState('ppm-box-target', 'ppm-target-val', 'ppm-target-trend', valText, trendHTML, stateClass);
+                } else {
+                    updateCardState('ppm-box-target', 'ppm-target-val', 'ppm-target-trend', '-', '', 'state-blue');
+                }
+
+                // 1.2 PPM Month-on-Month
+                if (ppmLatest !== null && ppmPrev !== null) {
+                    const diffPct = ppmPrev > 0 ? ((ppmLatest - ppmPrev) / ppmPrev) * 100 : 0;
+                    const valText = Math.round(ppmLatest).toLocaleString();
+                    let trendHTML = '';
+                    let stateClass = 'state-blue';
+                    if (ppmLatest < ppmPrev) {
+                        stateClass = 'state-green';
+                        trendHTML = `<i data-lucide="trending-down"></i> -${Math.abs(diffPct).toFixed(1)}% vs prev month`;
+                    } else if (ppmLatest > ppmPrev) {
+                        stateClass = 'state-red';
+                        trendHTML = `<i data-lucide="trending-up"></i> +${Math.abs(diffPct).toFixed(1)}% vs prev month`;
+                    } else {
+                        trendHTML = `No change`;
+                    }
+                    updateCardState('ppm-box-mom', 'ppm-mom-val', 'ppm-mom-trend', valText, trendHTML, stateClass);
+                } else if (ppmLatest !== null) {
+                    updateCardState('ppm-box-mom', 'ppm-mom-val', 'ppm-mom-trend', Math.round(ppmLatest).toLocaleString(), 'No previous month data', 'state-blue');
+                } else {
+                    updateCardState('ppm-box-mom', 'ppm-mom-val', 'ppm-mom-trend', '-', '', 'state-blue');
+                }
+
+                // 1.3 PPM YoY Quarter
+                if (latestMonthStr) {
+                    const [yrStr, mnStr] = latestMonthStr.split('-');
+                    const currYear = parseInt(yrStr);
+                    const currMonth = parseInt(mnStr);
+                    const currQuarter = Math.floor((currMonth - 1) / 3) + 1;
+                    const prevYear = currYear - 1;
+
+                    function getQuarterStats(year, quarterNum) {
+                        let defect = 0, shipped = 0;
+                        const startMonth = (quarterNum - 1) * 3 + 1;
+                        for (let offset = 0; offset < 3; offset++) {
+                            const mStr = `${year}-${String(startMonth + offset).padStart(2, '0')}`;
+                            if (monthlyPpm[mStr]) {
+                                defect += monthlyPpm[mStr].defect;
+                                shipped += monthlyPpm[mStr].shipped;
                             }
-                        });
-                        const avgFpy = countFpy > 0 ? (sumFpy / countFpy).toFixed(1) : "0.0";
-                        document.getElementById('summary-yield').textContent = `${avgFpy}%`;
-                        document.getElementById('card-yield-val').textContent = `${avgFpy}%`;
-                        
-                        const labelEl = document.querySelector('.stat-card:nth-child(2) .stat-label');
-                        if (labelEl) labelEl.textContent = `FPY Yield (${latestYieldYear} ${processName})`;
-                        const subEl = document.querySelector('.stat-card:nth-child(2) .stat-change');
-                        if (subEl) subEl.innerHTML = `<i data-lucide="info"></i> Average of ${countFpy} records`;
+                        }
+                        return shipped > 0 ? (defect / shipped) * 1000000 : null;
                     }
+
+                    const ppmCurrQ = getQuarterStats(currYear, currQuarter);
+                    const ppmPrevQ = getQuarterStats(prevYear, currQuarter);
+
+                    if (ppmCurrQ !== null && ppmPrevQ !== null) {
+                        const diffPct = ppmPrevQ > 0 ? ((ppmCurrQ - ppmPrevQ) / ppmPrevQ) * 100 : 0;
+                        const valText = Math.round(ppmCurrQ).toLocaleString() + ` (Q${currQuarter})`;
+                        let trendHTML = '';
+                        let stateClass = 'state-blue';
+                        if (ppmCurrQ < ppmPrevQ) {
+                            stateClass = 'state-green';
+                            trendHTML = `<i data-lucide="trending-down"></i> -${Math.abs(diffPct).toFixed(1)}% YoY (Q${currQuarter})`;
+                        } else if (ppmCurrQ > ppmPrevQ) {
+                            stateClass = 'state-red';
+                            trendHTML = `<i data-lucide="trending-up"></i> +${Math.abs(diffPct).toFixed(1)}% YoY (Q${currQuarter})`;
+                        } else {
+                            trendHTML = `No change YoY`;
+                        }
+                        updateCardState('ppm-box-qoq', 'ppm-qoq-val', 'ppm-qoq-trend', valText, trendHTML, stateClass);
+                    } else if (ppmCurrQ !== null) {
+                        updateCardState('ppm-box-qoq', 'ppm-qoq-val', 'ppm-qoq-trend', Math.round(ppmCurrQ).toLocaleString() + ` (Q${currQuarter})`, 'No previous year Q data', 'state-blue');
+                    } else {
+                        updateCardState('ppm-box-qoq', 'ppm-qoq-val', 'ppm-qoq-trend', '-', '', 'state-blue');
+                    }
+                } else {
+                    updateCardState('ppm-box-qoq', 'ppm-qoq-val', 'ppm-qoq-trend', '-', '', 'state-blue');
                 }
 
-                // 3. Total WIP Latest (Latest Month in Data)
-                const wipDataAll = db.get('wip_data') || [];
-                if (wipDataAll.length > 0) {
-                    const wipMonths = [...new Set(wipDataAll.map(d => d.date ? d.date.substring(0, 7) : ''))].filter(m => m).sort();
-                    const latestWipMonth = wipMonths.length > 0 ? wipMonths[wipMonths.length - 1] : '2026-06';
-                    const wipData = wipDataAll.filter(d => d.date && d.date.startsWith(latestWipMonth));
-                    if (wipData.length > 0) {
-                        const totalWip = wipData.reduce((sum, d) => sum + Number(d.total_wip), 0);
-                        document.getElementById('summary-wip').textContent = Math.round(totalWip).toLocaleString();
-                        document.getElementById('card-wip-val').textContent = Math.round(totalWip).toLocaleString();
-                        
-                        const [yr, mn] = latestWipMonth.split('-');
-                        const mNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                        const mName = mNames[parseInt(mn) - 1] || mn;
-                        
-                        const labelEl = document.querySelector('.stat-card:nth-child(3) .stat-label');
-                        if (labelEl) labelEl.textContent = `Active WIP (${mName} ${yr})`;
-                        const subEl = document.querySelector('.stat-card:nth-child(3) .stat-change');
-                        if (subEl) subEl.innerHTML = `<i data-lucide="info"></i> Sum of all models`;
-                        
-                        const summaryPeriodEl = document.getElementById('summary-period');
-                        if (summaryPeriodEl) summaryPeriodEl.textContent = `Latest: ${mName} ${yr}`;
-                    }
-                }
 
-                // 4. Avg Scrap Rate (Latest Year in Data)
-                const scrapDataAll = db.get('scrap_data') || [];
-                if (scrapDataAll.length > 0) {
-                    const scrapYears = scrapDataAll.map(d => {
-                        if (!d.date) return null;
-                        const date = new Date(d.date);
-                        return isNaN(date.getTime()) ? null : date.getFullYear();
-                    }).filter(y => y);
-                    const latestScrapYear = scrapYears.length > 0 ? Math.max(...scrapYears) : 2026;
-                    const scrapData = scrapDataAll.filter(d => {
-                        if (!d.date) return false;
-                        const date = new Date(d.date);
-                        return date.getFullYear() === latestScrapYear;
+                // ==========================================
+                // 2. FPY & FY Yield
+                // ==========================================
+                function getMonthlyYields(yieldDataAll) {
+                    const filtered = yieldDataAll.filter(d => {
+                        const isG8X = d.project && d.project.toLowerCase().includes('g8x');
+                        return activeProfile === 'G8X' ? isG8X : !isG8X;
                     });
-                    if (scrapData.length > 0) {
-                        const okQty = scrapData.filter(d => d.process_status.endsWith(':OK')).reduce((sum, d) => sum + Number(d.qty), 0);
-                        const scrapQty = scrapData.filter(d => d.process_status.endsWith(':Scrap')).reduce((sum, d) => sum + Number(d.qty), 0);
-                        if (okQty + scrapQty > 0) {
-                            const scrapRate = ((scrapQty / (okQty + scrapQty)) * 100).toFixed(2);
-                            document.getElementById('summary-scrap').textContent = `${scrapRate}%`;
-                            document.getElementById('card-scrap-val').textContent = `${scrapRate}%`;
-                            
-                            const labelEl = document.querySelector('.stat-card:nth-child(4) .stat-label');
-                            if (labelEl) labelEl.textContent = `Avg Scrap Rate (${latestScrapYear})`;
-                            const subEl = document.querySelector('.stat-card:nth-child(4) .stat-change');
-                            if (subEl) subEl.innerHTML = `<i data-lucide="info"></i> Total scrap: ${scrapQty.toLocaleString()} pcs`;
+                    
+                    const monthlyStats = {};
+                    filtered.forEach(d => {
+                        if (!d.date) return;
+                        const monthStr = d.date.substring(0, 7);
+                        let val = 0;
+                        if (d.yield !== undefined && d.yield !== null) {
+                            val = Number(d.yield);
+                        } else if (Number(d.ins) > 0) {
+                            val = (Number(d.ok) / Number(d.ins)) * 100;
+                        } else {
+                            return;
+                        }
+                        if (!monthlyStats[monthStr]) {
+                            monthlyStats[monthStr] = { sum: 0, count: 0 };
+                        }
+                        monthlyStats[monthStr].sum += val;
+                        monthlyStats[monthStr].count += 1;
+                    });
+                    
+                    const monthlyAverages = {};
+                    for (const mStr in monthlyStats) {
+                        monthlyAverages[mStr] = monthlyStats[mStr].sum / monthlyStats[mStr].count;
+                    }
+                    return monthlyAverages;
+                }
+
+                const fpyAverages = getMonthlyYields(db.get('yield_fpy_data') || []);
+                const fyAverages = getMonthlyYields(db.get('yield_fy_data') || []);
+                const yieldMonths = [...new Set([...Object.keys(fpyAverages), ...Object.keys(fyAverages)])].sort();
+
+                let yieldLatestMonth = '';
+                let fpyLatest = null, fpyPrev = null;
+                let fyLatest = null, fyPrev = null;
+
+                if (yieldMonths.length > 0) {
+                    yieldLatestMonth = yieldMonths[yieldMonths.length - 1];
+                    fpyLatest = fpyAverages[yieldLatestMonth] !== undefined ? fpyAverages[yieldLatestMonth] : null;
+                    fyLatest = fyAverages[yieldLatestMonth] !== undefined ? fyAverages[yieldLatestMonth] : null;
+
+                    const prevMonthStr = getPrevMonthStr(yieldLatestMonth);
+                    fpyPrev = fpyAverages[prevMonthStr] !== undefined ? fpyAverages[prevMonthStr] : (yieldMonths.length > 1 ? fpyAverages[yieldMonths[yieldMonths.length - 2]] : null);
+                    fyPrev = fyAverages[prevMonthStr] !== undefined ? fyAverages[prevMonthStr] : (yieldMonths.length > 1 ? fyAverages[yieldMonths[yieldMonths.length - 2]] : null);
+                }
+
+                // 2.1 Yield Month-on-Month Card
+                if (fpyLatest !== null) {
+                    document.getElementById('yield-fpy-mom-val').textContent = `${fpyLatest.toFixed(1)}%`;
+                    const fpyTrendEl = document.getElementById('yield-fpy-mom-trend');
+                    if (fpyPrev !== null && fpyTrendEl) {
+                        const diff = fpyLatest - fpyPrev;
+                        fpyTrendEl.style.color = diff > 0 ? 'var(--color-success)' : (diff < 0 ? 'var(--color-danger)' : 'var(--color-info)');
+                        fpyTrendEl.innerHTML = `<i data-lucide="${diff >= 0 ? 'trending-up' : 'trending-down'}"></i> ${diff >= 0 ? '+' : ''}${diff.toFixed(1)}% vs prev`;
+                    } else if (fpyTrendEl) {
+                        fpyTrendEl.innerHTML = '';
+                    }
+                } else {
+                    document.getElementById('yield-fpy-mom-val').textContent = '-';
+                    document.getElementById('yield-fpy-mom-trend').innerHTML = '';
+                }
+
+                if (fyLatest !== null) {
+                    document.getElementById('yield-fy-mom-val').textContent = `${fyLatest.toFixed(1)}%`;
+                    const fyTrendEl = document.getElementById('yield-fy-mom-trend');
+                    if (fyPrev !== null && fyTrendEl) {
+                        const diff = fyLatest - fyPrev;
+                        fyTrendEl.style.color = diff > 0 ? 'var(--color-success)' : (diff < 0 ? 'var(--color-danger)' : 'var(--color-info)');
+                        fyTrendEl.innerHTML = `<i data-lucide="${diff >= 0 ? 'trending-up' : 'trending-down'}"></i> ${diff >= 0 ? '+' : ''}${diff.toFixed(1)}% vs prev`;
+                    } else if (fyTrendEl) {
+                        fyTrendEl.innerHTML = '';
+                    }
+                } else {
+                    document.getElementById('yield-fy-mom-val').textContent = '-';
+                    document.getElementById('yield-fy-mom-trend').innerHTML = '';
+                }
+
+                // Set overall card state for yield mom
+                const yieldMomCard = document.getElementById('yield-box-mom');
+                if (yieldMomCard) {
+                    if (fpyLatest !== null && fpyPrev !== null) {
+                        const diff = fpyLatest - fpyPrev;
+                        if (diff > 0) yieldMomCard.className = 'kpi-card state-green';
+                        else if (diff < 0) yieldMomCard.className = 'kpi-card state-red';
+                        else yieldMomCard.className = 'kpi-card state-blue';
+                    } else {
+                        yieldMomCard.className = 'kpi-card state-blue';
+                    }
+                }
+
+                // 2.2 Yield YoY Quarter Card
+                if (yieldLatestMonth) {
+                    const [yrStr, mnStr] = yieldLatestMonth.split('-');
+                    const currYear = parseInt(yrStr);
+                    const currMonth = parseInt(mnStr);
+                    const currQuarter = Math.floor((currMonth - 1) / 3) + 1;
+                    const prevYear = currYear - 1;
+
+                    function getQuarterYieldAverage(averagesMap, year, quarterNum) {
+                        let sum = 0, count = 0;
+                        const startMonth = (quarterNum - 1) * 3 + 1;
+                        for (let offset = 0; offset < 3; offset++) {
+                            const mStr = `${year}-${String(startMonth + offset).padStart(2, '0')}`;
+                            if (averagesMap[mStr] !== undefined) {
+                                sum += averagesMap[mStr];
+                                count++;
+                            }
+                        }
+                        return count > 0 ? sum / count : null;
+                    }
+
+                    const fpyCurrQ = getQuarterYieldAverage(fpyAverages, currYear, currQuarter);
+                    const fpyPrevQ = getQuarterYieldAverage(fpyAverages, prevYear, currQuarter);
+                    const fyCurrQ = getQuarterYieldAverage(fyAverages, currYear, currQuarter);
+                    const fyPrevQ = getQuarterYieldAverage(fyAverages, prevYear, currQuarter);
+
+                    if (fpyCurrQ !== null) {
+                        document.getElementById('yield-fpy-qoq-val').textContent = `${fpyCurrQ.toFixed(1)}% (Q${currQuarter})`;
+                        const fpyQTrendEl = document.getElementById('yield-fpy-qoq-trend');
+                        if (fpyPrevQ !== null && fpyQTrendEl) {
+                            const diff = fpyCurrQ - fpyPrevQ;
+                            fpyQTrendEl.style.color = diff > 0 ? 'var(--color-success)' : (diff < 0 ? 'var(--color-danger)' : 'var(--color-info)');
+                            fpyQTrendEl.innerHTML = `<i data-lucide="${diff >= 0 ? 'trending-up' : 'trending-down'}"></i> ${diff >= 0 ? '+' : ''}${diff.toFixed(1)}% YoY`;
+                        } else if (fpyQTrendEl) {
+                            fpyQTrendEl.innerHTML = '';
+                        }
+                    } else {
+                        document.getElementById('yield-fpy-qoq-val').textContent = '-';
+                        document.getElementById('yield-fpy-qoq-trend').innerHTML = '';
+                    }
+
+                    if (fyCurrQ !== null) {
+                        document.getElementById('yield-fy-qoq-val').textContent = `${fyCurrQ.toFixed(1)}% (Q${currQuarter})`;
+                        const fyQTrendEl = document.getElementById('yield-fy-qoq-trend');
+                        if (fyPrevQ !== null && fyQTrendEl) {
+                            const diff = fyCurrQ - fyPrevQ;
+                            fyQTrendEl.style.color = diff > 0 ? 'var(--color-success)' : (diff < 0 ? 'var(--color-danger)' : 'var(--color-info)');
+                            fyQTrendEl.innerHTML = `<i data-lucide="${diff >= 0 ? 'trending-up' : 'trending-down'}"></i> ${diff >= 0 ? '+' : ''}${diff.toFixed(1)}% YoY`;
+                        } else if (fyQTrendEl) {
+                            fyQTrendEl.innerHTML = '';
+                        }
+                    } else {
+                        document.getElementById('yield-fy-qoq-val').textContent = '-';
+                        document.getElementById('yield-fy-qoq-trend').innerHTML = '';
+                    }
+
+                    const yieldQoqCard = document.getElementById('yield-box-qoq');
+                    if (yieldQoqCard) {
+                        if (fpyCurrQ !== null && fpyPrevQ !== null) {
+                            const diff = fpyCurrQ - fpyPrevQ;
+                            if (diff > 0) yieldQoqCard.className = 'kpi-card state-green';
+                            else if (diff < 0) yieldQoqCard.className = 'kpi-card state-red';
+                            else yieldQoqCard.className = 'kpi-card state-blue';
+                        } else {
+                            yieldQoqCard.className = 'kpi-card state-blue';
                         }
                     }
+                } else {
+                    document.getElementById('yield-fpy-qoq-val').textContent = '-';
+                    document.getElementById('yield-fpy-qoq-trend').innerHTML = '';
+                    document.getElementById('yield-fy-qoq-val').textContent = '-';
+                    document.getElementById('yield-fy-qoq-trend').innerHTML = '';
+                    const yieldQoqCard = document.getElementById('yield-box-qoq');
+                    if (yieldQoqCard) yieldQoqCard.className = 'kpi-card state-blue';
                 }
-                
-                // Initialize Lucide icons on updated sub-elements
+
+
+                // ==========================================
+                // 3. WIP Control (G8X Only)
+                // ==========================================
+                const wipSection = document.getElementById('wip-section');
+                const wipSummaryBox = document.getElementById('summary-wip-box');
+                let wipData = [];
+                let latestWipMonth = '';
+
+                if (activeProfile === 'G8X') {
+                    if (wipSection) wipSection.style.display = 'block';
+                    if (wipSummaryBox) wipSummaryBox.style.display = 'flex';
+
+                    const wipDataAll = db.get('wip_data') || [];
+                    const wipMonths = [...new Set(wipDataAll.map(d => d.date ? d.date.substring(0, 7) : ''))].filter(m => m).sort();
+                    if (wipMonths.length > 0) {
+                        latestWipMonth = wipMonths[wipMonths.length - 1];
+                        wipData = wipDataAll.filter(d => d.date && d.date.startsWith(latestWipMonth));
+                    }
+
+                    const wipTargets = { LHD: 2360, RHD: 960, Diffuser: 700 };
+                    
+                    ['LHD', 'RHD', 'Diffuser'].forEach(type => {
+                        const rec = wipData.find(d => d.type === type);
+                        const cardId = `wip-box-${type.toLowerCase()}`;
+                        const valId = `wip-${type.toLowerCase()}-val`;
+                        const trendId = `wip-${type.toLowerCase()}-trend`;
+                        
+                        if (rec) {
+                            const actual = Number(rec.total_wip || 0);
+                            const target = wipTargets[type];
+                            const devPct = ((actual - target) / target) * 100;
+                            const isWithinRange = Math.abs(devPct) <= 10;
+                            const stateClass = isWithinRange ? 'state-green' : 'state-yellow';
+                            const icon = isWithinRange ? 'check' : 'alert-triangle';
+                            const trendHTML = `<i data-lucide="${icon}"></i> ${devPct >= 0 ? '+' : ''}${devPct.toFixed(1)}% deviation`;
+                            
+                            updateCardState(cardId, valId, trendId, actual.toLocaleString(), trendHTML, stateClass);
+                        } else {
+                            updateCardState(cardId, valId, trendId, '-', '', 'state-blue');
+                        }
+                    });
+                } else {
+                    if (wipSection) wipSection.style.display = 'none';
+                    if (wipSummaryBox) wipSummaryBox.style.display = 'none';
+                }
+
+
+                // ==========================================
+                // 4. Scrap Rate Performance
+                // ==========================================
+                const scrapDataAll = db.get('scrap_data') || [];
+                const profileScrap = scrapDataAll.filter(d => {
+                    const isG8X = d.erp_code && d.erp_code.toLowerCase().includes('g8x');
+                    return activeProfile === 'G8X' ? isG8X : !isG8X;
+                });
+
+                const monthlyScrap = {};
+                profileScrap.forEach(d => {
+                    if (!d.date || !d.process_status || !d.qty) return;
+                    const monthStr = d.date.substring(0, 7);
+                    if (!monthlyScrap[monthStr]) {
+                        monthlyScrap[monthStr] = { ok: 0, scrap: 0 };
+                    }
+                    const status = d.process_status.toLowerCase();
+                    if (status.endsWith(':ok')) {
+                        monthlyScrap[monthStr].ok += Number(d.qty);
+                    } else if (status.endsWith(':scrap')) {
+                        monthlyScrap[monthStr].scrap += Number(d.qty);
+                    }
+                });
+
+                const scrapRates = {};
+                for (const mStr in monthlyScrap) {
+                    const ok = monthlyScrap[mStr].ok;
+                    const scrap = monthlyScrap[mStr].scrap;
+                    if (ok + scrap > 0) {
+                        scrapRates[mStr] = (scrap / (ok + scrap)) * 100;
+                    }
+                }
+
+                const scrapMonths = Object.keys(scrapRates).sort();
+                let scrapLatest = null;
+                let scrapPrev = null;
+                let latestScrapMonthStr = '';
+
+                if (scrapMonths.length > 0) {
+                    latestScrapMonthStr = scrapMonths[scrapMonths.length - 1];
+                    scrapLatest = scrapRates[latestScrapMonthStr];
+
+                    const prevMonthStr = getPrevMonthStr(latestScrapMonthStr);
+                    scrapPrev = scrapRates[prevMonthStr] !== undefined ? scrapRates[prevMonthStr] : (scrapMonths.length > 1 ? scrapRates[scrapMonths[scrapMonths.length - 2]] : null);
+                }
+
+                function getScrapStateClass(rate) {
+                    if (rate === null || rate === undefined) return 'state-blue';
+                    if (rate > 10) return 'state-red';
+                    if (rate > 5) return 'state-yellow';
+                    return 'state-green';
+                }
+
+                // 4.1 Scrap MoM
+                if (scrapLatest !== null) {
+                    const stateClass = getScrapStateClass(scrapLatest);
+                    const valText = `${scrapLatest.toFixed(2)}%`;
+                    let trendHTML = '';
+                    if (scrapPrev !== null) {
+                        const diff = scrapLatest - scrapPrev;
+                        trendHTML = `<i data-lucide="${diff >= 0 ? 'trending-up' : 'trending-down'}"></i> ${diff >= 0 ? '+' : ''}${diff.toFixed(2)}% vs prev`;
+                    }
+                    updateCardState('scrap-box-mom', 'scrap-mom-val', 'scrap-mom-trend', valText, trendHTML, stateClass);
+                } else {
+                    updateCardState('scrap-box-mom', 'scrap-mom-val', 'scrap-mom-trend', '-', '', 'state-blue');
+                }
+
+                // 4.2 Scrap YoY Quarter
+                if (latestScrapMonthStr) {
+                    const [yrStr, mnStr] = latestScrapMonthStr.split('-');
+                    const currYear = parseInt(yrStr);
+                    const currMonth = parseInt(mnStr);
+                    const currQuarter = Math.floor((currMonth - 1) / 3) + 1;
+                    const prevYear = currYear - 1;
+
+                    function getQuarterlyScrapRate(year, quarterNum) {
+                        let totalOk = 0, totalScrap = 0;
+                        const startMonth = (quarterNum - 1) * 3 + 1;
+                        for (let offset = 0; offset < 3; offset++) {
+                            const mStr = `${year}-${String(startMonth + offset).padStart(2, '0')}`;
+                            if (monthlyScrap[mStr]) {
+                                totalOk += monthlyScrap[mStr].ok;
+                                totalScrap += monthlyScrap[mStr].scrap;
+                            }
+                        }
+                        return (totalOk + totalScrap) > 0 ? (totalScrap / (totalOk + totalScrap)) * 100 : null;
+                    }
+
+                    const scrapCurrQ = getQuarterlyScrapRate(currYear, currQuarter);
+                    const scrapPrevQ = getQuarterlyScrapRate(prevYear, currQuarter);
+
+                    if (scrapCurrQ !== null) {
+                        const stateClass = getScrapStateClass(scrapCurrQ);
+                        const valText = `${scrapCurrQ.toFixed(2)}% (Q${currQuarter})`;
+                        let trendHTML = '';
+                        if (scrapPrevQ !== null) {
+                            const diff = scrapCurrQ - scrapPrevQ;
+                            trendHTML = `<i data-lucide="${diff >= 0 ? 'trending-up' : 'trending-down'}"></i> ${diff >= 0 ? '+' : ''}${diff.toFixed(2)}% YoY`;
+                        }
+                        updateCardState('scrap-box-qoq', 'scrap-qoq-val', 'scrap-qoq-trend', valText, trendHTML, stateClass);
+                    } else {
+                        updateCardState('scrap-box-qoq', 'scrap-qoq-val', 'scrap-qoq-trend', '-', '', 'state-blue');
+                    }
+                } else {
+                    updateCardState('scrap-box-qoq', 'scrap-qoq-val', 'scrap-qoq-trend', '-', '', 'state-blue');
+                }
+
+
+                // ==========================================
+                // 5. Summary Statistics (Top of Page)
+                // ==========================================
+                // 5.1 PPM Avg (Latest Year in Data)
+                const years = profilePpm.map(d => parseInt(d.date.split('-')[0])).filter(y => y);
+                const latestPpmYear = years.length > 0 ? Math.max(...years) : 2026;
+                const ppmYearData = profilePpm.filter(d => parseInt(d.date.split('-')[0]) === latestPpmYear);
+                const yrDefects = ppmYearData.reduce((s, d) => s + Number(d.defect_qty || 0), 0);
+                const yrShipped = ppmYearData.reduce((s, d) => s + Number(d.shipped_qty || 0), 0);
+                const ppmAvg = yrShipped > 0 ? ((yrDefects / yrShipped) * 1000000) : 0;
+                document.getElementById('summary-ppm').textContent = ppmAvg.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 2});
+
+                // 5.2 Yield FPY Avg (Latest Year in Data)
+                const yieldYears = Object.keys(fpyAverages).map(m => parseInt(m.split('-')[0]));
+                const latestYieldYear = yieldYears.length > 0 ? Math.max(...yieldYears) : 2026;
+                const yearMonths = Object.keys(fpyAverages).filter(m => m.startsWith(latestYieldYear.toString()));
+                let sumFpy = 0, countFpy = 0;
+                yearMonths.forEach(m => {
+                    sumFpy += fpyAverages[m];
+                    countFpy++;
+                });
+                const avgFpy = countFpy > 0 ? (sumFpy / countFpy) : 0;
+                document.getElementById('summary-yield').textContent = `${avgFpy.toFixed(1)}%`;
+
+                // 5.3 Total WIP Latest (Latest Month in Data)
+                if (activeProfile === 'G8X' && wipData.length > 0) {
+                    const totalWip = wipData.reduce((sum, d) => sum + Number(d.total_wip || 0), 0);
+                    document.getElementById('summary-wip').textContent = Math.round(totalWip).toLocaleString();
+                } else {
+                    document.getElementById('summary-wip').textContent = '0';
+                }
+
+                // 5.4 Avg Scrap Rate (Latest Year in Data)
+                const scrapYears = Object.keys(scrapRates).map(m => parseInt(m.split('-')[0]));
+                const latestScrapYear = scrapYears.length > 0 ? Math.max(...scrapYears) : 2026;
+                let yearOk = 0, yearScrap = 0;
+                for (const mStr in monthlyScrap) {
+                    if (mStr.startsWith(latestScrapYear.toString())) {
+                        yearOk += monthlyScrap[mStr].ok;
+                        yearScrap += monthlyScrap[mStr].scrap;
+                    }
+                }
+                const avgScrap = (yearOk + yearScrap) > 0 ? (yearScrap / (yearOk + yearScrap)) * 100 : 0;
+                document.getElementById('summary-scrap').textContent = `${avgScrap.toFixed(2)}%`;
+
+                // 5.5 Summary Period Text
+                const summaryPeriodEl = document.getElementById('summary-period');
+                if (summaryPeriodEl && latestMonthStr) {
+                    const [yr, mn] = latestMonthStr.split('-');
+                    const mNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    const mName = mNames[parseInt(mn) - 1] || mn;
+                    summaryPeriodEl.textContent = `Latest: ${mName} ${yr}`;
+                }
+
+                // Initialize Lucide icons on updated elements
                 if (typeof lucide !== 'undefined') {
                     lucide.createIcons();
                 }
             } catch (err) {
                 console.error("Error calculating summary: ", err);
             }
+        }
+
+        // Inject Layout and Calculate Home Stats
+        document.addEventListener('DOMContentLoaded', () => {
+            injectLayout("Operations Dashboard");
+            
+            // Calculate Home Page Summary Statistics dynamically
+            recalculateStats();
         });
     </script>
 </body>

@@ -1,23 +1,141 @@
 // Common Application Utilities and State Controller
 
 // Initialize LocalStorage database if empty or if schema reset is required
-function initDatabase() {
-    const hasOldTargets = localStorage.getItem('ppm_targets') && 
-                          (localStorage.getItem('ppm_targets').includes('G8X-013 Mirror L') || 
-                           localStorage.getItem('ppm_targets').includes('"target":15'));
-                           
-    const has2026Data = localStorage.getItem('ppm_data') && 
-                        localStorage.getItem('ppm_data').includes('2026-03-15');
-                           
-        const hasProjectInClaims = localStorage.getItem('claims_data') && 
-                               localStorage.getItem('claims_data').includes('"project":');
-    
-    const hasReworkWaitType = localStorage.getItem('rework_data') && 
-                              localStorage.getItem('rework_data').includes('Waiting');
-                            
-    if (!localStorage.getItem('bmw_db_initialized') || hasOldTargets || !has2026Data || !hasProjectInClaims || !hasReworkWaitType) {
-        localStorage.clear(); // Safe clear since this is a demonstration local app
+const firebaseConfig = {
+  apiKey: "AIzaSyBi57QgtET8mGrda_06EyufAbpiAt197iQ",
+  authDomain: "qualityreport-e2390.firebaseapp.com",
+  projectId: "qualityreport-e2390",
+  storageBucket: "qualityreport-e2390.firebasestorage.app",
+  messagingSenderId: "285001201084",
+  appId: "1:285001201084:web:a89d8a5b69a051e9eda7b9",
+  measurementId: "G-5ZFLYRN0XS"
+};
+
+let firestoreDb = null;
+let isFirebaseInitialized = false;
+
+function loadFirebaseSDKs() {
+    return new Promise((resolve, reject) => {
+        if (window.firebase) {
+            resolve();
+            return;
+        }
         
+        const appScript = document.createElement('script');
+        appScript.src = "https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js";
+        appScript.onload = () => {
+            const firestoreScript = document.createElement('script');
+            firestoreScript.src = "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js";
+            firestoreScript.onload = () => {
+                resolve();
+            };
+            firestoreScript.onerror = () => reject(new Error("Failed to load Firebase Firestore SDK"));
+            document.head.appendChild(firestoreScript);
+        };
+        appScript.onerror = () => reject(new Error("Failed to load Firebase App SDK"));
+        document.head.appendChild(appScript);
+    });
+}
+
+async function initFirebase() {
+    try {
+        await loadFirebaseSDKs();
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        firestoreDb = firebase.firestore();
+        isFirebaseInitialized = true;
+        console.log("Firebase initialized successfully.");
+        await syncFirestoreToLocal();
+    } catch (error) {
+        console.error("Firebase initialization failed:", error);
+    }
+}
+
+const FIREBASE_KEYS = [
+    'ppm_targets', 'ppm_data', 'claims_data', 'yield_targets', 
+    'yield_fpy_data', 'yield_fy_data', 'wip_targets', 'wip_data', 
+    'rework_data', 'scrap_data', 'scrap_targets', 'scrap_daily', 
+    'scrap_inven', 'quality_data', 'claim_motorrad_data'
+];
+
+async function syncFirestoreToLocal() {
+    if (!firestoreDb) return;
+    try {
+        const metaDoc = await firestoreDb.collection('metadata').doc('init').get();
+        const needsSeeding = !metaDoc.exists || metaDoc.data().version !== 'v8';
+        
+        if (needsSeeding) {
+            console.log("Firestore empty or outdated version. Seeding initial data...");
+            const batch = firestoreDb.batch();
+            
+            for (const key of FIREBASE_KEYS) {
+                let dataToSeed = [];
+                const localData = localStorage.getItem(key);
+                if (localData) {
+                    try {
+                        dataToSeed = JSON.parse(localData);
+                    } catch (err) {
+                        dataToSeed = MOCK_DATA[key] || [];
+                    }
+                } else {
+                    dataToSeed = MOCK_DATA[key] || [];
+                }
+                
+                const docRef = firestoreDb.collection('data_store').doc(key);
+                batch.set(docRef, { data: dataToSeed });
+            }
+            
+            batch.set(firestoreDb.collection('metadata').doc('init'), { version: 'v8' });
+            await batch.commit();
+            console.log("Firestore seeded successfully.");
+        }
+        
+        console.log("Syncing Firestore data to LocalStorage...");
+        const promises = FIREBASE_KEYS.map(async (key) => {
+            const doc = await firestoreDb.collection('data_store').doc(key).get();
+            if (doc.exists) {
+                const rawList = doc.data().data || [];
+                localStorage.setItem(key, JSON.stringify(rawList));
+            }
+        });
+        
+        await Promise.all(promises);
+        localStorage.setItem('bmw_db_initialized', 'v8');
+        console.log("Firestore sync complete. Refreshing active report views...");
+        
+        refreshActiveReport();
+        
+        document.dispatchEvent(new CustomEvent('dbReady'));
+    } catch (e) {
+        console.error("Firestore sync failed:", e);
+    }
+}
+
+function refreshActiveReport() {
+    try {
+        if (typeof populateProjectFilter === 'function') populateProjectFilter();
+        if (typeof renderYieldReport === 'function') renderYieldReport();
+        if (typeof renderPpmReport === 'function') renderPpmReport();
+        if (typeof renderClaimsReport === 'function') renderClaimsReport();
+        if (typeof renderMotorradReport === 'function') renderMotorradReport();
+        if (typeof renderQualityReport === 'function') renderQualityReport();
+        if (typeof renderReworkReports === 'function') renderReworkReports();
+        if (typeof renderScrapRateReport === 'function') renderScrapRateReport();
+        if (typeof renderTopScrapReport === 'function') renderTopScrapReport();
+        if (typeof renderWipReport === 'function') renderWipReport();
+        if (typeof renderLogsTable === 'function') renderLogsTable();
+        if (typeof recalculateStats === 'function') recalculateStats();
+    } catch (err) {
+        console.error("Error refreshing active report:", err);
+    }
+}
+
+function initDatabase() {
+    initFirebase();
+    
+    const DB_VERSION = 'v8';
+    if (localStorage.getItem('bmw_db_initialized') !== DB_VERSION) {
         localStorage.setItem('ppm_targets', JSON.stringify(MOCK_DATA.ppm_targets));
         localStorage.setItem('ppm_data', JSON.stringify(MOCK_DATA.ppm_data));
         localStorage.setItem('claims_data', JSON.stringify(MOCK_DATA.claims_data));
@@ -31,11 +149,12 @@ function initDatabase() {
         localStorage.setItem('scrap_targets', JSON.stringify(MOCK_DATA.scrap_targets));
         localStorage.setItem('scrap_daily', JSON.stringify(MOCK_DATA.scrap_daily));
         localStorage.setItem('scrap_inven', JSON.stringify(MOCK_DATA.scrap_inven));
+        localStorage.setItem('quality_data', JSON.stringify(MOCK_DATA.quality_data));
+        localStorage.setItem('claim_motorrad_data', JSON.stringify(MOCK_DATA.claim_motorrad_data));
         
-        localStorage.setItem('bmw_db_initialized', 'true');
-        console.log("Database initialized/reset with SMR/SMP seed data.");
+        localStorage.setItem('bmw_db_initialized', DB_VERSION);
+        console.log("Database initialized/reset with SMR/SMP/Motorrad seed data version " + DB_VERSION);
     }
-    // Perform database health check, date repair, and deduplication
     cleanAndDeduplicateDB();
 }
 
@@ -49,7 +168,9 @@ const DB_SCHEMAS = {
     ppm_data: ["date", "customer", "code", "defect_qty", "shipped_qty"],
     claims_data: ["date", "project", "claim_type", "location", "qty"],
     scrap_daily: ["date", "process", "erp_code", "defect", "qty"],
-    scrap_inven: ["date", "erp_code", "input_qty"]
+    scrap_inven: ["date", "erp_code", "process", "status", "qty"],
+    quality_data: ["date", "reports_8d", "sorting_action", "quality_incident", "quality"],
+    claim_motorrad_data: ["no", "code_8d", "date", "cust", "cust_claim_no", "title", "customer_pn", "cac_pn_erp", "part_name", "description", "claim_type", "qty", "status_8d", "ref_num", "follow_up", "model_code"]
 };
 
 // Compression Maps
@@ -168,6 +289,18 @@ const db = {
             }
             
             localStorage.setItem(key, JSON.stringify(valToStore));
+            
+            // Sync to Firestore asynchronously
+            if (isFirebaseInitialized && firestoreDb) {
+                firestoreDb.collection('data_store').doc(key).set({ data: valToStore })
+                    .then(() => {
+                        console.log(`Synced ${key} to Firestore.`);
+                    })
+                    .catch(err => {
+                        console.error(`Failed to sync ${key} to Firestore:`, err);
+                    });
+            }
+            
             return true;
         } catch (e) {
             console.error("LocalStorage setItem failed:", e);
@@ -186,7 +319,7 @@ function cleanAndDeduplicateDB() {
     const keys = [
         'scrap_data', 'rework_data', 'wip_data', 
         'yield_fpy_data', 'yield_fy_data', 'ppm_data', 
-        'claims_data', 'scrap_daily', 'scrap_inven'
+        'claims_data', 'scrap_daily', 'scrap_inven', 'quality_data', 'claim_motorrad_data'
     ];
     let totalCleaned = 0;
     
@@ -228,7 +361,11 @@ function cleanAndDeduplicateDB() {
                 } else if (key === 'scrap_daily') {
                     dupKey = `${item.date}_${item.process}_${item.erp_code}_${item.defect}_${item.qty}`;
                 } else if (key === 'scrap_inven') {
-                    dupKey = `${item.date}_${item.erp_code}_${item.input_qty}`;
+                    dupKey = `${item.date}_${item.erp_code}_${item.process}_${item.status}_${item.qty}`;
+                } else if (key === 'quality_data') {
+                    dupKey = `${item.date}_${item.reports_8d}_${item.sorting_action}_${item.quality_incident}_${item.quality}`;
+                } else if (key === 'claim_motorrad_data') {
+                    dupKey = `${item.date}_${item.code_8d}_${item.title}_${item.model_code}_${item.status_8d}`;
                 } else {
                     dupKey = JSON.stringify(item);
                 }
@@ -322,6 +459,9 @@ function injectLayout(pageTitle = "BMW Portal") {
                     <li class="${filename === 'claims.html' ? 'active' : ''}">
                         <a href="claims.html"><i data-lucide="undo-2"></i>Claims Return</a>
                     </li>
+                    <li class="${filename === 'claim-motorrad.html' ? 'active' : ''}">
+                        <a href="claim-motorrad.html"><i data-lucide="alert-circle"></i>Claim Motorrad</a>
+                    </li>
                     <li class="${filename === 'yield.html' ? 'active' : ''}">
                         <a href="yield.html"><i data-lucide="gauge"></i>Yield Report</a>
                     </li>
@@ -333,6 +473,12 @@ function injectLayout(pageTitle = "BMW Portal") {
                     </li>
                     <li class="${filename === 'scrap.html' ? 'active' : ''}">
                         <a href="scrap.html"><i data-lucide="trash-2"></i>Scrap Report</a>
+                    </li>
+                    <li class="${filename === 'top-scrap.html' ? 'active' : ''}">
+                        <a href="top-scrap.html"><i data-lucide="pie-chart"></i>Top Process Scrap</a>
+                    </li>
+                    <li class="${filename === 'quality.html' ? 'active' : ''}">
+                        <a href="quality.html"><i data-lucide="award"></i>Quality Performance</a>
                     </li>
                     <li class="${filename === 'import.html' ? 'active' : ''}">
                         <a href="import.html"><i data-lucide="upload-cloud"></i>Import Portal</a>
@@ -504,13 +650,40 @@ function getQuarterString(dateStr) {
     return `Q${q} ${date.getFullYear()}`;
 }
 
-// Helper: Normalize Excel Date serials or strings to YYYY-MM-DD
+// Helper: Normalize Excel Date serials or strings to YYYY-MM-DD (with BE to CE support)
 function normalizeDate(val) {
     if (!val) return '';
     
+    const dateStr = String(val).trim();
+    const cleanDateStr = dateStr.split(/\s+/)[0];
+    
+    // Parse Month-Year shorthand format like Jan-25, Feb-26, Jan-2025, etc.
+    const matchMy = cleanDateStr.match(/^([a-zA-Z]{3})[/-](\d{2})$/);
+    if (matchMy) {
+        const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+        const mIdx = months.indexOf(matchMy[1].toLowerCase());
+        if (mIdx !== -1) {
+            const m = String(mIdx + 1).padStart(2, '0');
+            const y = '20' + matchMy[2];
+            return `${y}-${m}-15`; // 15th of the month
+        }
+    }
+    const matchMy4 = cleanDateStr.match(/^([a-zA-Z]{3})[/-](\d{4})$/);
+    if (matchMy4) {
+        const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+        const mIdx = months.indexOf(matchMy4[1].toLowerCase());
+        if (mIdx !== -1) {
+            const m = String(mIdx + 1).padStart(2, '0');
+            let y = parseInt(matchMy4[2]);
+            if (y > 2400) y -= 543;
+            return `${y}-${m}-15`; // 15th of the month
+        }
+    }
+
     // 1. If it's a JS Date object
     if (val instanceof Date || (typeof val === 'object' && typeof val.getMonth === 'function')) {
-        const y = val.getFullYear();
+        let y = val.getFullYear();
+        if (y > 2400) y -= 543;
         const m = String(val.getMonth() + 1).padStart(2, '0');
         const d = String(val.getDate()).padStart(2, '0');
         return `${y}-${m}-${d}`;
@@ -522,12 +695,14 @@ function normalizeDate(val) {
         const utcDays = Math.floor(num - 25569);
         const utcValue = utcDays * 86400;
         const dateObj = new Date(utcValue * 1000);
-        return dateObj.toISOString().split('T')[0];
+        let y = dateObj.getFullYear();
+        if (y > 2400) y -= 543;
+        const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const d = String(dateObj.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
     }
     
-    // Clean string by splitting on whitespace to remove any time suffix
-    const dateStr = String(val).trim();
-    const cleanDateStr = dateStr.split(/\s+/)[0];
+    // Already cleaned and split at the top of function
     
     // 3. If format contains '/'
     if (cleanDateStr.includes('/')) {
@@ -539,7 +714,8 @@ function normalizeDate(val) {
             
             if (part0.length === 4) {
                 // yyyy/mm/dd
-                const y = part0;
+                let y = parseInt(part0);
+                if (y > 2400) y -= 543;
                 const m = part1.padStart(2, '0');
                 const d = part2.padStart(2, '0');
                 return `${y}-${m}-${d}`;
@@ -547,9 +723,10 @@ function normalizeDate(val) {
                 // dd/mm/yyyy or d/m/yy
                 const d = part0.padStart(2, '0');
                 const m = part1.padStart(2, '0');
-                let y = part2;
-                if (y.length === 2) {
-                    y = '20' + y;
+                let y = parseInt(part2);
+                if (y > 2400) y -= 543;
+                else if (String(part2).length === 2) {
+                    y = 2000 + y;
                 }
                 return `${y}-${m}-${d}`;
             }
@@ -566,14 +743,17 @@ function normalizeDate(val) {
             
             if (part0.length === 4) {
                 // yyyy-mm-dd
-                return `${part0}-${part1.padStart(2, '0')}-${part2.padStart(2, '0')}`;
+                let y = parseInt(part0);
+                if (y > 2400) y -= 543;
+                return `${y}-${part1.padStart(2, '0')}-${part2.padStart(2, '0')}`;
             } else {
                 // dd-mm-yyyy or d-m-yy
                 const d = part0.padStart(2, '0');
                 const m = part1.padStart(2, '0');
-                let y = part2;
-                if (y.length === 2) {
-                    y = '20' + y;
+                let y = parseInt(part2);
+                if (y > 2400) y -= 543;
+                else if (String(part2).length === 2) {
+                    y = 2000 + y;
                 }
                 return `${y}-${m}-${d}`;
             }
@@ -583,7 +763,11 @@ function normalizeDate(val) {
     // Fallback: try standard Date parsing
     const date = new Date(dateStr);
     if (!isNaN(date.getTime())) {
-        return date.toISOString().split('T')[0];
+        let y = date.getFullYear();
+        if (y > 2400) y -= 543;
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
     }
     
     return dateStr;

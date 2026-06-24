@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        // Force trailing slash for repository roots on GitHub Pages to prevent relative path 404s
+        if (!window.location.pathname.endsWith('/') && !window.location.pathname.includes('.')) {
+            window.location.replace(window.location.href + '/');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMW Quality Portal - Claim Motorrad</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Chart.js & Datalabels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div id="main-wrapper">
+        <div id="header-container"></div>
+        <main>
+            <!-- Premium Filters Bar -->
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label for="group-mode">X-Axis Grouping</label>
+                    <select id="group-mode">
+                        <option value="Monthly">Monthly</option>
+                        <option value="Quarterly">Quarterly</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Select Project (CAC P/N)</label>
+                    <div class="multiselect-dropdown" id="motorrad-project-dropdown">
+                        <button class="multiselect-btn" id="motorrad-project-btn" type="button">All Projects</button>
+                        <div class="multiselect-options" id="motorrad-project-options" style="display: none;"></div>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label for="motorrad-year">Select Year</label>
+                    <select id="motorrad-year">
+                        <option value="All">All Years</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Charts Layout -->
+            <div class="grid-2col" style="margin-bottom: 1.5rem;">
+                <!-- Graph 1: Claim Count by CAC P/N -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">CLAIM COUNT 2025-2026</h3>
+                            <p class="card-subtitle">Number of logs aggregated by CAC P/N model codes</p>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper" style="height: 400px; position: relative;">
+                        <canvas id="chartModelCode"></canvas>
+                    </div>
+                </div>
+
+                <!-- Graph 2: Claim Status by 8D-Status -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">CLAIM STATUS 2025-2026</h3>
+                            <p class="card-subtitle">Number of logs aggregated by 8D Status</p>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper" style="height: 400px; position: relative;">
+                        <canvas id="chartStatus8d"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2col" style="grid-template-columns: 2fr 3fr; margin-bottom: 1.5rem;">
+                <!-- Graph 3: Claim Type proportion breakdown -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Claim Type Proportions</h3>
+                            <p class="card-subtitle">Percentage breakdown of claim defect types</p>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper" style="height: 350px; position: relative; display: flex; justify-content: center; align-items: center;">
+                        <canvas id="chartClaimType" style="max-height: 320px; max-width: 320px;"></canvas>
+                    </div>
+                </div>
+
+                <!-- Summary statistics and details summary card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Motorrad Claim Summary</h3>
+                            <p class="card-subtitle">Key performance statistics for the filtered period</p>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; height: calc(100% - 70px); align-content: center; padding: 1rem 0;">
+                        <div style="background-color: var(--accent-blue-light); border-left: 4px solid var(--accent-blue); padding: 1.25rem; border-radius: 8px; transition: all 0.2s;">
+                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.5rem;">Total Logs</span>
+                            <span id="stat-total-logs" style="font-family: 'Outfit', sans-serif; font-size: 2.25rem; font-weight: 700; color: var(--text-primary);">0</span>
+                        </div>
+                        <div style="background-color: rgba(16, 185, 129, 0.08); border-left: 4px solid var(--color-success); padding: 1.25rem; border-radius: 8px;">
+                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.5rem;">Closed Claims</span>
+                            <span id="stat-closed-claims" style="font-family: 'Outfit', sans-serif; font-size: 2.25rem; font-weight: 700; color: var(--color-success);">0</span>
+                        </div>
+                        <div style="background-color: rgba(245, 158, 11, 0.08); border-left: 4px solid var(--color-warning); padding: 1.25rem; border-radius: 8px;">
+                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.5rem;">Active Open Claims</span>
+                            <span id="stat-open-claims" style="font-family: 'Outfit', sans-serif; font-size: 2.25rem; font-weight: 700; color: var(--color-warning);">0</span>
+                        </div>
+                        <div style="background-color: rgba(239, 68, 68, 0.08); border-left: 4px solid var(--color-danger); padding: 1.25rem; border-radius: 8px;">
+                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.5rem;">Rejected Claims</span>
+                            <span id="stat-rejected-claims" style="font-family: 'Outfit', sans-serif; font-size: 2.25rem; font-weight: 700; color: var(--color-danger);">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details Log Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Motorrad Claim Logs</h3>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">No.</th>
+                                <th style="width: 140px;">8D Code</th>
+                                <th style="width: 110px;">Claim Date</th>
+                                <th style="width: 130px;">Customer</th>
+                                <th>Claim Title</th>
+                                <th style="width: 110px; text-align: center;">CAC P/N</th>
+                                <th style="width: 130px;">Claim Type</th>
+                                <th style="width: 80px; text-align: center;">Qty</th>
+                                <th style="width: 100px; text-align: center;">8D Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="motorrad-table-body">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/mock-data.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/claim-motorrad.js"></script>
+</body>
+</html>

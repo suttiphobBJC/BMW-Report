@@ -45,8 +45,10 @@
                     <li class="tab-item" id="btn-tab-claims" onclick="switchImportTab('claims')">Claims</li>
                     <li class="tab-item" id="btn-tab-wip" onclick="switchImportTab('wip')">WIP</li>
                     <li class="tab-item" id="btn-tab-rework" onclick="switchImportTab('rework')">Rework</li>
-                    <li class="tab-item" id="btn-tab-scrap-top" onclick="switchImportTab('scrap-top')">Scrap Defect & Inven</li>
+                    <li class="tab-item" id="btn-tab-top-scrap" onclick="switchImportTab('top-scrap')">Top Process Scrap</li>
                     <li class="tab-item" id="btn-tab-scrap-input" onclick="switchImportTab('scrap-input')">Scrap Data Input</li>
+                    <li class="tab-item" id="btn-tab-quality" onclick="switchImportTab('quality')">Quality Performance</li>
+                    <li class="tab-item" id="btn-tab-claim-motorrad" onclick="switchImportTab('claim-motorrad')">Claim Motorrad</li>
                 </ul>
             </div>
 
@@ -58,7 +60,7 @@
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 1rem;">
                         <p style="font-size: 0.875rem; color: var(--text-secondary);">
-                            Select an Excel file. The script will look for two tabs: <code>FPY</code> and <code>FY</code>.
+                            Select an Excel file. The script will look for tabs named <code>FPY</code>, <code>FY</code>, or yield target sheets like <code>Yield Master Data</code> / <code>Target</code>.
                         </p>
                         <input type="file" id="file-yield-input" accept=".xlsx, .xls">
                         <button class="btn btn-primary" id="upload-yield-btn" style="align-self: flex-start;">
@@ -83,6 +85,19 @@
                     </div>
                     <button class="btn btn-primary" id="paste-yield-btn" style="width: 100%;">
                         <i data-lucide="check"></i> Process & Save Pasted Yield Data
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option C: Copy-Paste Yield Target Master Data</h3>
+                    </div>
+                    <div class="paste-container">
+                        <label for="paste-yield-targets">Paste Yield Master Data / Targets here</label>
+                        <textarea id="paste-yield-targets" class="paste-textarea" style="height: 150px;" placeholder="Expected format: Columns with Project, Process, Target.&#10;Example:&#10;Project	Process	Target&#10;G8X	Layup	90%&#10;G8X	Trimming	90%"></textarea>
+                    </div>
+                    <button class="btn btn-primary" id="paste-yield-targets-btn" style="width: 100%; margin-top: 1rem;">
+                        <i data-lucide="check"></i> Process & Save Yield Target Master Data
                     </button>
                 </div>
 
@@ -291,19 +306,27 @@
                 </div>
             </div>
 
-            <!-- Tab 4: Scrap Defect & Inventory -->
-            <div id="content-tab-scrap-top" class="tab-content">
+            <!-- Tab 6: Top Process Scrap -->
+            <div id="content-tab-top-scrap" class="tab-content">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Option A: Excel File Upload</h3>
+                        <h3 class="card-title">Option A: Excel File Upload (Daily Scrap & Inven)</h3>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 1rem;">
                         <p style="font-size: 0.875rem; color: var(--text-secondary);">
-                            Select an Excel file containing defect logs. The script will parse sheets: <code>Daily Scrap</code> and <code>Inven</code>.
+                            Select an Excel file containing sheets <code>Daily Scrap</code> and <code>Inven</code>.
                         </p>
-                        <input type="file" id="file-scrap-input" accept=".xlsx, .xls">
-                        <button class="btn btn-primary" id="upload-scrap-btn" style="align-self: flex-start;">
-                            <i data-lucide="upload"></i> Upload & Import Scrap Defect File
+                        <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.5rem;">
+                            <label for="import-top-scrap-year" style="font-size: 0.875rem; font-weight: 600; color: var(--text-secondary);">Default Year for Inven dates:</label>
+                            <select id="import-top-scrap-year" style="padding: 0.35rem 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary);">
+                                <option value="2026">2026</option>
+                                <option value="2025">2025</option>
+                                <option value="2027">2027</option>
+                            </select>
+                        </div>
+                        <input type="file" id="file-top-scrap-input" accept=".xlsx, .xls">
+                        <button class="btn btn-primary" id="upload-top-scrap-btn" style="align-self: flex-start;">
+                            <i data-lucide="upload"></i> Upload & Import Top Scrap Data
                         </button>
                     </div>
                 </div>
@@ -314,16 +337,24 @@
                     </div>
                     <div class="grid-2col">
                         <div class="paste-container">
-                            <label for="paste-scrap-daily">Paste Daily Scrap cells (Flat OR Matrix format)</label>
-                            <textarea id="paste-scrap-daily" class="paste-textarea" placeholder="Flat format: Columns: Date, Process, ERPCode, Defect, Qty&#10;OR Matrix format: ERP Code, Process (e.g. Layup:OK/Scrap), followed by date columns (e.g. 10-Mar, 11-Mar...)"></textarea>
+                            <label for="paste-daily-scrap">Paste Daily Scrap sheet cells</label>
+                            <textarea id="paste-daily-scrap" class="paste-textarea" style="height: 180px;" placeholder="Columns: Scrap Date, Production order, CAC Part no., Process, Q'ty, Scrap Defect"></textarea>
                         </div>
                         <div class="paste-container">
-                            <label for="paste-scrap-inven">Paste Inventory Input sheet cells</label>
-                            <textarea id="paste-scrap-inven" class="paste-textarea" placeholder="Columns: Date/Month, ERPCode, InputQty"></textarea>
+                            <label for="paste-inven">Paste Inven sheet cells (Matrix layout)</label>
+                            <textarea id="paste-inven" class="paste-textarea" style="height: 180px;" placeholder="Columns: ERP Code, Customer Code, Part Description, Process1, Process, No. Process, Status, Before pro, followed by day columns (1-Jan, 2-Jan...)"></textarea>
                         </div>
                     </div>
-                    <button class="btn btn-primary" id="paste-scrap-btn" style="width: 100%;">
-                        <i data-lucide="check"></i> Process Pasted Defect Data
+                    <div style="display: flex; gap: 1rem; align-items: center; margin-top: 1rem; margin-bottom: 1rem;">
+                        <label for="paste-top-scrap-year" style="font-size: 0.875rem; font-weight: 600; color: var(--text-secondary);">Default Year for Pasted Inven Dates:</label>
+                        <select id="paste-top-scrap-year" style="padding: 0.35rem 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary);">
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                            <option value="2027">2027</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="paste-top-scrap-btn" style="width: 100%;">
+                        <i data-lucide="check"></i> Process & Save Pasted Top Scrap Data
                     </button>
                 </div>
 
@@ -335,10 +366,10 @@
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                         <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;">
-                            Permanently clear all existing Scrap, Daily Scrap, and Scrap Inventory records from local storage.
+                            Permanently clear all Daily Scrap and Inven database records from local storage.
                         </p>
-                        <button class="btn btn-danger" id="clear-scrap-btn">
-                            <i data-lucide="trash-2"></i> Clear Scrap Data
+                        <button class="btn btn-danger" id="clear-top-scrap-btn">
+                            <i data-lucide="trash-2"></i> Clear Top Scrap & Inven Data
                         </button>
                     </div>
                 </div>
@@ -438,6 +469,100 @@
                         <div class="pagination-controls" id="pagination-controls-div" style="display: flex; gap: 0.25rem;">
                             <!-- Dynamic buttons -->
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 8: Quality Performance Import -->
+            <div id="content-tab-quality" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option A: Excel File Upload</h3>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                            Select a Quality Performance Excel file containing columns for Date, 8D Reports, Sorting Action, Quality Incident, and Quality.
+                        </p>
+                        <input type="file" id="file-quality-input" accept=".xlsx, .xls">
+                        <button class="btn btn-primary" id="upload-quality-btn" style="align-self: flex-start;">
+                            <i data-lucide="upload"></i> Upload & Import Quality File
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option B: Copy-Paste Data</h3>
+                    </div>
+                    <div class="paste-container">
+                        <label for="paste-quality">Copy-Paste Quality Excel cells (Tab-separated values)</label>
+                        <textarea id="paste-quality" class="paste-textarea" style="height: 180px;" placeholder="Expected columns: Date, 8D Reports, Sorting Action, Quality Incident, Quality"></textarea>
+                    </div>
+                    <button class="btn btn-primary" id="paste-quality-btn" style="width: 100%; margin-top: 1rem;">
+                        <i data-lucide="check"></i> Process Quality Data
+                    </button>
+                </div>
+
+                <div class="card" style="border-color: var(--color-danger); opacity: 0.95; margin-top: 1.5rem;">
+                    <div class="card-header" style="margin-bottom: 1rem;">
+                        <h3 class="card-title" style="color: var(--color-danger); display: flex; align-items: center; gap: 0.5rem;">
+                            <i data-lucide="alert-triangle"></i> Danger Zone
+                        </h3>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;">
+                            Permanently clear all existing Quality Performance records from local storage.
+                        </p>
+                        <button class="btn btn-danger" id="clear-quality-btn">
+                            <i data-lucide="trash-2"></i> Clear Quality Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 9: Claim Motorrad Import -->
+            <div id="content-tab-claim-motorrad" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option A: Excel File Upload</h3>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                            Select a Claim Motorrad Excel file containing columns for Claim, 8D Code, Claim date, Cust., Cust Claim no., Claim Title, Customer P/N., CAC P/N. (ERP), Part name, Issue Description, Claim Type, Quantity (EA), 8D status, Reference number, Follow up result, and CAC P/N.
+                        </p>
+                        <input type="file" id="file-claim-motorrad-input" accept=".xlsx, .xls">
+                        <button class="btn btn-primary" id="upload-claim-motorrad-btn" style="align-self: flex-start;">
+                            <i data-lucide="upload"></i> Upload & Import Claim Motorrad File
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Option B: Copy-Paste Data</h3>
+                    </div>
+                    <div class="paste-container">
+                        <label for="paste-claim-motorrad">Copy-Paste Claim Motorrad Excel cells (Tab-separated values)</label>
+                        <textarea id="paste-claim-motorrad" class="paste-textarea" style="height: 180px;" placeholder="Expected columns: Claim, 8D Code, Claim date, Cust., Cust Claim no., Claim Title, Customer P/N., CAC P/N. (ERP), Part name, Issue Description, Claim Type, Quantity (EA), 8D status, Reference number, Follow up result, CAC P/N"></textarea>
+                    </div>
+                    <button class="btn btn-primary" id="paste-claim-motorrad-btn" style="width: 100%; margin-top: 1rem;">
+                        <i data-lucide="check"></i> Process Claim Motorrad Data
+                    </button>
+                </div>
+
+                <div class="card" style="border-color: var(--color-danger); opacity: 0.95; margin-top: 1.5rem;">
+                    <div class="card-header" style="margin-bottom: 1rem;">
+                        <h3 class="card-title" style="color: var(--color-danger); display: flex; align-items: center; gap: 0.5rem;">
+                            <i data-lucide="alert-triangle"></i> Danger Zone
+                        </h3>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;">
+                            Permanently clear all existing Claim Motorrad records from local storage.
+                        </p>
+                        <button class="btn btn-danger" id="clear-claim-motorrad-btn">
+                            <i data-lucide="trash-2"></i> Clear Claim Motorrad Data
+                        </button>
                     </div>
                 </div>
             </div>

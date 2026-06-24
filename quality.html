@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        // Force trailing slash for repository roots on GitHub Pages to prevent relative path 404s
+        if (!window.location.pathname.endsWith('/') && !window.location.pathname.includes('.')) {
+            window.location.replace(window.location.href + '/');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMW Quality Portal - Quality Performance</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Chart.js & Datalabels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div id="main-wrapper">
+        <div id="header-container"></div>
+        <main>
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label for="quality-year">Year</label>
+                    <select id="quality-year">
+                        <option value="All">All Years</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="quality-report-type">Report Type</label>
+                    <select id="quality-report-type">
+                        <option value="Monthly">Monthly</option>
+                        <option value="Quarterly">Quarterly</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Custom Styled Chart Header Banner -->
+            <div style="display: flex; justify-content: center; margin-bottom: 0.5rem;">
+                <div class="chart-header-banner" id="quality-chart-header">
+                    BMW QUALITY RATING
+                </div>
+            </div>
+
+            <!-- Chart Card -->
+            <div class="card">
+                <div class="chart-wrapper" style="height: 520px;">
+                    <canvas id="qualityChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Table Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Quality Rating Details Table</h3>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Period</th>
+                                <th>8D Reports</th>
+                                <th>Sorting Action</th>
+                                <th>Quality Incident</th>
+                                <th>Quality</th>
+                            </tr>
+                        </thead>
+                        <tbody id="quality-table-body">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/mock-data.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/quality.js"></script>
+</body>
+</html>

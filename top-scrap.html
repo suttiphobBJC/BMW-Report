@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        // Force trailing slash for repository roots on GitHub Pages to prevent relative path 404s
+        if (!window.location.pathname.endsWith('/') && !window.location.pathname.includes('.')) {
+            window.location.replace(window.location.href + '/');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMW Quality Portal - Top Process Scrap</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Chart.js & Datalabels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div id="main-wrapper">
+        <div id="header-container"></div>
+        <main>
+            <!-- Title Bar -->
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label for="scrap-year">Select Year</label>
+                    <select id="scrap-year">
+                        <option value="2026">2026 (Compare vs 2025)</option>
+                        <option value="2025">2025 (Compare vs 2024)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="scrap-quarter">Select Quarter</label>
+                    <select id="scrap-quarter">
+                        <option value="All">All Year</option>
+                        <option value="Q1">Q1</option>
+                        <option value="Q2">Q2</option>
+                        <option value="Q3">Q3</option>
+                        <option value="Q4">Q4</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Custom Header Banner -->
+            <div style="display: flex; justify-content: center; margin-bottom: 0.5rem;">
+                <div class="chart-header-banner" id="top-scrap-header">
+                    TOP 5 SCRAP RATE
+                </div>
+            </div>
+
+            <!-- Chart Card -->
+            <div class="card">
+                <div class="chart-wrapper" style="height: 520px; padding-bottom: 60px;">
+                    <canvas id="topScrapChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Detail Table Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Defect Scrap Rate Details</h3>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ERP Type</th>
+                                <th>Scrap Defect</th>
+                                <th>Process</th>
+                                <th id="th-prev-qty">Prev Defect Qty (pcs)</th>
+                                <th id="th-prev-total">Prev Process Total (pcs)</th>
+                                <th id="th-prev-rate">Prev Scrap Rate (%)</th>
+                                <th id="th-curr-qty">Curr Defect Qty (pcs)</th>
+                                <th id="th-curr-total">Curr Process Total (pcs)</th>
+                                <th id="th-curr-rate">Curr Scrap Rate (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="top-scrap-table-body">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/mock-data.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/top-scrap.js"></script>
+</body>
+</html>

@@ -1,5 +1,7 @@
 // Yield Report Controller
 let yieldChartInstance = null;
+let selectedYieldProjects = [];
+let allYieldProjects = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     injectLayout("Yield Performance Report");
@@ -7,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderYieldReport();
     
     // Bind listeners
-    document.getElementById('yield-project').addEventListener('change', renderYieldReport);
     document.getElementById('yield-report-type').addEventListener('change', () => {
         const qFilter = document.getElementById('quarter-filter-group');
         const reportType = document.getElementById('yield-report-type').value;
@@ -18,6 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.getElementById('yield-quarter').addEventListener('change', renderYieldReport);
     document.getElementById('yield-process').addEventListener('change', renderYieldReport);
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('yield-project-dropdown');
+        const options = document.getElementById('yield-project-options');
+        if (dropdown && options && !dropdown.contains(e.target)) {
+            options.style.display = 'none';
+        }
+    });
 });
 
 function populateProjectFilter() {
@@ -28,32 +38,86 @@ function populateProjectFilter() {
         ...fyData.map(d => d.project || 'N/A')
     ])].sort();
     
-    const dropdown = document.getElementById('yield-project');
-    if (!dropdown) return;
+    allYieldProjects = projects;
+    selectedYieldProjects = [...projects]; // Default select all
     
-    const prevVal = dropdown.value;
-    dropdown.innerHTML = '';
+    const btn = document.getElementById('yield-project-btn');
+    const optionsDiv = document.getElementById('yield-project-options');
+    if (!btn || !optionsDiv) return;
     
-    if (projects.length === 0) {
-        const opt = document.createElement('option');
-        opt.value = 'G8X';
-        opt.textContent = 'G8X';
-        dropdown.appendChild(opt);
-        return;
-    }
+    optionsDiv.innerHTML = '';
     
+    // Select All option
+    const selectAllLabel = document.createElement('label');
+    selectAllLabel.className = 'multiselect-item';
+    selectAllLabel.innerHTML = `
+        <input type="checkbox" id="yield-select-all" checked>
+        <span><strong>Select All</strong></span>
+    `;
+    optionsDiv.appendChild(selectAllLabel);
+    
+    // Individual Project options
     projects.forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p;
-        opt.textContent = p;
-        dropdown.appendChild(opt);
+        const label = document.createElement('label');
+        label.className = 'multiselect-item';
+        label.innerHTML = `
+            <input type="checkbox" value="${p}" class="yield-proj-checkbox" checked>
+            <span>${p}</span>
+        `;
+        optionsDiv.appendChild(label);
     });
     
-    if (projects.includes(prevVal)) {
-        dropdown.value = prevVal;
-    } else {
-        dropdown.value = projects[0];
+    // Toggle options panel visibility
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isHidden = optionsDiv.style.display === 'none' || optionsDiv.style.display === '';
+        optionsDiv.style.display = isHidden ? 'block' : 'none';
+    });
+    
+    const selectAllCheckbox = document.getElementById('yield-select-all');
+    const projCheckboxes = optionsDiv.querySelectorAll('.yield-proj-checkbox');
+    
+    // Select All logic
+    selectAllCheckbox.addEventListener('change', () => {
+        const isChecked = selectAllCheckbox.checked;
+        projCheckboxes.forEach(cb => {
+            cb.checked = isChecked;
+        });
+        updateYieldSelection();
+    });
+    
+    // Individual checkboxes logic
+    projCheckboxes.forEach(cb => {
+        cb.addEventListener('change', () => {
+            const allChecked = Array.from(projCheckboxes).every(c => c.checked);
+            const noneChecked = Array.from(projCheckboxes).every(c => !c.checked);
+            selectAllCheckbox.checked = allChecked;
+            selectAllCheckbox.indeterminate = !allChecked && !noneChecked;
+            updateYieldSelection();
+        });
+    });
+    
+    function updateYieldSelection() {
+        selectedYieldProjects = Array.from(projCheckboxes)
+            .filter(c => c.checked)
+            .map(c => c.value);
+        updateYieldBtnText();
+        renderYieldReport();
     }
+    
+    function updateYieldBtnText() {
+        if (selectedYieldProjects.length === 0) {
+            btn.textContent = 'None Selected';
+        } else if (selectedYieldProjects.length === allYieldProjects.length) {
+            btn.textContent = 'All Projects';
+        } else if (selectedYieldProjects.length <= 2) {
+            btn.textContent = selectedYieldProjects.join(', ');
+        } else {
+            btn.textContent = `${selectedYieldProjects.length} Selected`;
+        }
+    }
+    
+    updateYieldBtnText();
 }
 
 function renderYieldReport() {
@@ -62,7 +126,6 @@ function renderYieldReport() {
         activePlugins.push(ChartDataLabels);
     }
 
-    const project = document.getElementById('yield-project').value;
     const reportType = document.getElementById('yield-report-type').value;
     const process = document.getElementById('yield-process').value;
     const selectedQuarter = document.getElementById('yield-quarter') ? document.getElementById('yield-quarter').value : 'All';
@@ -70,16 +133,18 @@ function renderYieldReport() {
     // Update chart header banner
     document.getElementById('yield-chart-header').textContent = process;
 
-    const fpyData = db.get('yield_fpy_data');
-    const fyData = db.get('yield_fy_data');
-    const targets = db.get('yield_targets');
+    const fpyData = db.get('yield_fpy_data') || [];
+    const fyData = db.get('yield_fy_data') || [];
+    const targets = db.get('yield_targets') || [];
     
-    // Target for this process
-    const targetRow = targets.find(t => t.project === project && t.process.toLowerCase() === process.toLowerCase());
-    const targetVal = targetRow ? Number(targetRow.target) : 90;
+    // Target for this process (averaged across selected projects)
+    const targetRows = targets.filter(t => selectedYieldProjects.includes(t.project) && t.process.toLowerCase() === process.toLowerCase());
+    const targetVal = targetRows.length > 0
+        ? (targetRows.reduce((sum, t) => sum + Number(t.target), 0) / targetRows.length)
+        : 90;
 
     // Filter project and process
-    const filterFn = d => d.project === project && d.process.toLowerCase() === process.toLowerCase();
+    const filterFn = d => selectedYieldProjects.includes(d.project) && d.process.toLowerCase() === process.toLowerCase();
     const fpyFiltered = fpyData.filter(filterFn);
     const fyFiltered = fyData.filter(filterFn);
 
@@ -91,10 +156,12 @@ function renderYieldReport() {
     
     // Determine active months based on selected quarter
     let activeMonths = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-    if (selectedQuarter === 'Q1') activeMonths = [1, 2, 3];
-    else if (selectedQuarter === 'Q2') activeMonths = [4, 5, 6];
-    else if (selectedQuarter === 'Q3') activeMonths = [7, 8, 9];
-    else if (selectedQuarter === 'Q4') activeMonths = [10, 11, 12];
+    if (reportType !== 'Year') {
+        if (selectedQuarter === 'Q1') activeMonths = [1, 2, 3];
+        else if (selectedQuarter === 'Q2') activeMonths = [4, 5, 6];
+        else if (selectedQuarter === 'Q3') activeMonths = [7, 8, 9];
+        else if (selectedQuarter === 'Q4') activeMonths = [10, 11, 12];
+    }
 
     // We will aggregate FPY & FY by year and month
     const aggregateData = (dataset) => {
@@ -306,6 +373,134 @@ function renderYieldReport() {
             isYtm: true
         });
 
+    } else if (reportType === 'Year') {
+        tableHeaders = ['Year', 'FPY Yield (%)', 'Final Yield (%)', 'Target (%)'];
+
+        // 1. 2025 Total
+        let totalFpy2025 = 0;
+        let totalFy2025 = 0;
+        
+        if (fpyUseYield) {
+            let sum = 0, count = 0;
+            for (const m of activeMonths) {
+                const key = `2025-${String(m).padStart(2, '0')}`;
+                const val = getMonthlyYield(fpyAgg[key], true);
+                if (val !== null) {
+                    sum += val;
+                    count++;
+                }
+            }
+            totalFpy2025 = count > 0 ? (sum / count) : 0;
+        } else {
+            let totalFpyIns2025 = 0, totalFpyOk2025 = 0;
+            for (const m of activeMonths) {
+                const key = `2025-${String(m).padStart(2, '0')}`;
+                if (fpyAgg[key]) {
+                    totalFpyIns2025 += fpyAgg[key].ins;
+                    totalFpyOk2025 += fpyAgg[key].ok;
+                }
+            }
+            totalFpy2025 = totalFpyIns2025 > 0 ? (totalFpyOk2025 / totalFpyIns2025 * 100) : 0;
+        }
+        
+        if (fyUseYield) {
+            let sum = 0, count = 0;
+            for (const m of activeMonths) {
+                const key = `2025-${String(m).padStart(2, '0')}`;
+                const val = getMonthlyYield(fyAgg[key], true);
+                if (val !== null) {
+                    sum += val;
+                    count++;
+                }
+            }
+            totalFy2025 = count > 0 ? (sum / count) : 0;
+        } else {
+            let totalFyIns2025 = 0, totalFyOk2025 = 0;
+            for (const m of activeMonths) {
+                const key = `2025-${String(m).padStart(2, '0')}`;
+                if (fyAgg[key]) {
+                    totalFyIns2025 += fyAgg[key].ins;
+                    totalFyOk2025 += fyAgg[key].ok;
+                }
+            }
+            totalFy2025 = totalFyIns2025 > 0 ? (totalFyOk2025 / totalFyIns2025 * 100) : 0;
+        }
+
+        // 2. 2026 Total
+        let totalFpy2026 = 0;
+        let totalFy2026 = 0;
+        let totalFpyIns2026 = 0, totalFpyOk2026 = 0;
+        let totalFyIns2026 = 0, totalFyOk2026 = 0;
+
+        for (const m of activeMonths) {
+            const key = `2026-${String(m).padStart(2, '0')}`;
+            if (fpyAgg[key]) {
+                totalFpyIns2026 += fpyAgg[key].ins;
+                totalFpyOk2026 += fpyAgg[key].ok;
+            }
+            if (fyAgg[key]) {
+                totalFyIns2026 += fyAgg[key].ins;
+                totalFyOk2026 += fyAgg[key].ok;
+            }
+        }
+
+        if (fpyUseYield) {
+            let sum = 0, count = 0;
+            for (const m of activeMonths) {
+                const key = `2026-${String(m).padStart(2, '0')}`;
+                const val = getMonthlyYield(fpyAgg[key], true);
+                if (val !== null) {
+                    sum += val;
+                    count++;
+                }
+            }
+            totalFpy2026 = count > 0 ? (sum / count) : 0;
+        } else {
+            totalFpy2026 = totalFpyIns2026 > 0 ? (totalFpyOk2026 / totalFpyIns2026 * 100) : 0;
+        }
+
+        if (fyUseYield) {
+            let sum = 0, count = 0;
+            for (const m of activeMonths) {
+                const key = `2026-${String(m).padStart(2, '0')}`;
+                const val = getMonthlyYield(fyAgg[key], true);
+                if (val !== null) {
+                    sum += val;
+                    count++;
+                }
+            }
+            totalFy2026 = count > 0 ? (sum / count) : 0;
+        } else {
+            totalFy2026 = totalFyIns2026 > 0 ? (totalFyOk2026 / totalFyIns2026 * 100) : 0;
+        }
+
+        tableRows.push({
+            label: '2025',
+            fpy: totalFpy2025,
+            fy: totalFy2025,
+            target: targetVal,
+            isYtm: false
+        });
+        tableRows.push({
+            label: '2026',
+            fpy: totalFpy2026,
+            fy: totalFy2026,
+            target: targetVal,
+            isYtm: false
+        });
+
+        chartLabels.push('2025');
+        chartFpyVals.push(parseFloat(totalFpy2025.toFixed(1)));
+        chartFyFullVals.push(parseFloat(totalFy2025.toFixed(1)));
+        chartFyDiffVals.push(parseFloat(Math.max(0, totalFy2025 - totalFpy2025).toFixed(1)));
+        chartTargetVals.push(targetVal);
+
+        chartLabels.push('2026');
+        chartFpyVals.push(parseFloat(totalFpy2026.toFixed(1)));
+        chartFyFullVals.push(parseFloat(totalFy2026.toFixed(1)));
+        chartFyDiffVals.push(parseFloat(Math.max(0, totalFy2026 - totalFpy2026).toFixed(1)));
+        chartTargetVals.push(targetVal);
+
     } else {
         // Quarterly / Comparative Page
         tableHeaders = ['Month', '2025 FPY (%)', '2025 FY (%)', '2026 FPY (%)', '2026 FY (%)', 'Target (%)'];
@@ -470,12 +665,12 @@ function renderYieldReport() {
             trEl.className = 'ytm-row';
         }
         
-        if (reportType === 'Monthly') {
+        if (reportType === 'Monthly' || reportType === 'Year') {
             trEl.innerHTML = `
                 <td><strong>${row.label}</strong></td>
-                <td>${row.fpy.toFixed(1)}%</td>
-                <td>${row.fy.toFixed(1)}%</td>
-                <td>${row.target.toFixed(1)}%</td>
+                <td>${row.fpy !== null && row.fpy !== undefined ? row.fpy.toFixed(1) + '%' : '-'}</td>
+                <td>${row.fy !== null && row.fy !== undefined ? row.fy.toFixed(1) + '%' : '-'}</td>
+                <td>${row.target !== null && row.target !== undefined ? row.target.toFixed(1) + '%' : '-'}</td>
             `;
         } else {
             trEl.innerHTML = `
